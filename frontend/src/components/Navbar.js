@@ -1,0 +1,107 @@
+import { Link, useNavigate } from 'react-router-dom';
+import { TonConnectButton, useTonAddress } from '@tonconnect/ui-react';
+import { useAuth } from '../contexts/AuthContext';
+import { useCart } from '../contexts/CartContext';
+import { Button } from './ui/button';
+import { ShoppingCart, User, LogOut, LayoutDashboard, Gift } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu';
+
+const Navbar = () => {
+  const { user, logout } = useAuth();
+  const { cartItems } = useCart();
+  const navigate = useNavigate();
+  const walletAddress = useTonAddress();
+
+  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+
+  return (
+    <nav className="sticky top-0 z-50 glass-panel border-b border-white/10">
+      <div className="container mx-auto px-4 py-4">
+        <div className="flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2" data-testid="nav-home-link">
+            <div className="text-3xl font-orbitron font-black text-primary glow-text-primary uppercase tracking-tighter">
+              THRUSTER
+            </div>
+          </Link>
+
+          <div className="flex items-center gap-6">
+            <Link to="/products" data-testid="nav-products-link">
+              <Button variant="ghost" className="font-rajdhani text-white/80 hover:text-white">
+                Products
+              </Button>
+            </Link>
+            <Link to="/services" data-testid="nav-services-link">
+              <Button variant="ghost" className="font-rajdhani text-white/80 hover:text-white">
+                Services
+              </Button>
+            </Link>
+            <Link to="/rewards" data-testid="nav-rewards-link">
+              <Button variant="ghost" className="font-rajdhani text-white/80 hover:text-white flex items-center gap-2">
+                <Gift className="h-4 w-4" />
+                Rewards
+              </Button>
+            </Link>
+
+            <Link to="/cart" className="relative" data-testid="nav-cart-link">
+              <Button variant="ghost" size="icon" className="relative">
+                <ShoppingCart className="h-5 w-5" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-mono">
+                    {cartCount}
+                  </span>
+                )}
+              </Button>
+            </Link>
+
+            <div className="border-l border-white/10 pl-4">
+              <TonConnectButton />
+            </div>
+
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" data-testid="user-menu-trigger">
+                    <User className="h-5 w-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="bg-[#0F0F1C] border-white/10">
+                  <DropdownMenuItem onClick={() => navigate('/dashboard')} data-testid="nav-dashboard">
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    Dashboard
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/nfts')} data-testid="nav-nfts">
+                    <Gift className="mr-2 h-4 w-4" />
+                    My NFTs
+                  </DropdownMenuItem>
+                  {user.role === 'admin' && (
+                    <DropdownMenuItem onClick={() => navigate('/admin')} data-testid="nav-admin">
+                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                      Admin Panel
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem onClick={logout} data-testid="nav-logout">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Link to="/login" data-testid="nav-login-link">
+                <Button className="bg-primary hover:bg-primary/90 font-orbitron uppercase tracking-wider">
+                  Sign In
+                </Button>
+              </Link>
+            )}
+          </div>
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+export default Navbar;
