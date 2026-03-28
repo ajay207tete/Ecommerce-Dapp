@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const RewardCenter = () => {
-  const { user, token } = useAuth();
+  const { user, token, loading: authLoading } = useAuth();
   const [rewards, setRewards] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [totalRewards, setTotalRewards] = useState(0);
