@@ -326,9 +326,9 @@ class ThrusterAPITester:
             "check_out": (datetime.now() + timedelta(days=3)).strftime('%Y-%m-%d'),
             "guests": 2,
             "nights": 2,
-            "room_type": "Standard Room",
-            "total": hotel['price'] * 2,
-            "location": hotel.get('description', 'Test Location')
+            "room_type": hotel.get('room_type', 'Standard Room'),
+            "total": hotel.get('price_per_night', hotel.get('price', 100)) * 2,
+            "location": hotel.get('location', hotel.get('description', 'Test Location'))
         }
         
         order_status, order_response = self.make_request('POST', '/orders/hotel-booking', booking_data)
