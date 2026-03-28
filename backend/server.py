@@ -389,54 +389,42 @@ async def create_inr_payment(order_id: str, current_user: User = Depends(get_cur
 
 @api_router.post("/payments/create-crypto")
 async def create_crypto_payment(order_id: str, pay_currency: str, current_user: User = Depends(get_current_user)):
+    """Create NOWPayments crypto payment"""
+    from payment_handler import nowpayments
+    
     order = await db.orders.find_one({"id": order_id, "user_id": current_user.id}, {"_id": 0})
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
     
-    api_key = os.getenv("NOWPAYMENTS_API_KEY")
-    if not api_key or api_key == "YOUR_NOWPAYMENTS_API_KEY":
-        raise HTTPException(status_code=503, detail="Payment service not configured")
-    
-    headers = {"x-api-key": api_key, "Content-Type": "application/json"}
-    payload = {
-        "price_amount": order['total'],
-        "price_currency": "usd",
-        "pay_currency": pay_currency,
-        "order_id": order_id,
-        "order_description": f"Order {order_id}",
-        "ipn_callback_url": f"{os.getenv('FRONTEND_URL')}/api/webhooks/nowpayments"
-    }
-    
-    async with httpx.AsyncClient() as http_client:
-        try:
-            response = await http_client.post(
-                "https://api.nowpayments.io/v1/payment",
-                json=payload,
-                headers=headers,
-                timeout=30.0
-            )
-            if response.status_code != 201:
-                raise HTTPException(status_code=response.status_code, detail="Payment creation failed")
-            
-            payment_data = response.json()
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Payment service error: {str(e)}")
-    
-    payment = Payment(
-        order_id=order_id,
-        amount=order['total'],
-        method="crypto",
-        currency=pay_currency,
-        pay_address=payment_data.get("pay_address"),
-        pay_amount=payment_data.get("pay_amount"),
-        payment_provider_id=payment_data.get("payment_id")
-    )
-    
-    payment_doc = payment.model_dump()
-    payment_doc['created_at'] = payment_doc['created_at'].isoformat()
-    await db.payments.insert_one(payment_doc)
-    
-    return payment
+    try:
+        # Create NOWPayments payment
+        nowpayments_data = await nowpayments.create_payment({
+            "order_id": order_id,
+            "amount": order['total'],
+            "pay_currency": pay_currency,
+            "description": f"THRUSTER Order {order_id[:8]}"
+        })
+        
+        # Store payment in database
+        payment = Payment(
+            order_id=order_id,
+            amount=order['total'],
+            currency=pay_currency.upper(),
+            method="crypto",
+            status="waiting",
+            pay_address=nowpayments_data.get("pay_address"),
+            pay_amount=nowpayments_data.get("pay_amount"),
+            payment_provider_id=str(nowpayments_data.get("payment_id"))
+        )
+        
+        payment_doc = payment.model_dump()
+        payment_doc['created_at'] = payment_doc['created_at'].isoformat()
+        await db.payments.insert_one(payment_doc)
+        
+        return payment
+    except Exception as e:
+        logger.error(f"NOWPayments error: {e}")
+        raise HTTPException(status_code=500, detail=f"Payment creation failed: {str(e)}")
 
 
 @api_router.get("/payments/{payment_id}/status")
