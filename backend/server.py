@@ -507,6 +507,30 @@ async def get_payment_status(payment_id: str, current_user: User = Depends(get_c
     return payment
 
 
+@api_router.patch("/payments/{payment_id}/update-tx")
+async def update_payment_tx(payment_id: str, tx_data: dict, current_user: User = Depends(get_current_user)):
+    """Update payment with transaction hash"""
+    tx_hash = tx_data.get("tx_hash")
+    if not tx_hash:
+        raise HTTPException(status_code=400, detail="Transaction hash required")
+    
+    result = await db.payments.update_one(
+        {"id": payment_id},
+        {
+            "$set": {
+                "tx_hash": tx_hash,
+                "status": "confirming",
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }
+        }
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Payment not found")
+    
+    return {"message": "Transaction hash updated"}
+
+
 @api_router.post("/webhooks/cashfree")
 async def cashfree_webhook(request: Request):
     """Handle Cashfree payment webhook"""
