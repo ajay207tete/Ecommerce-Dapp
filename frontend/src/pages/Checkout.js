@@ -16,7 +16,8 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const Checkout = () => {
   const { cartItems, total, clearCart } = useCart();
-  const { user, token } = useAuth();
+  const { user, token, walletAddress } = useAuth();
+  const [tonConnectUI] = useTonConnectUI();
   const navigate = useNavigate();
   
   const [shippingInfo, setShippingInfo] = useState({
