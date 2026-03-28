@@ -19,6 +19,13 @@ const Checkout = () => {
   const { user, token, walletAddress } = useAuth();
   const [tonConnectUI] = useTonConnectUI();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  
+  const orderId = searchParams.get('order_id');
+  const orderType = searchParams.get('type');
+  
+  const [existingOrder, setExistingOrder] = useState(null);
+  const [orderTotal, setOrderTotal] = useState(0);
   
   const [shippingInfo, setShippingInfo] = useState({
     full_name: '',
