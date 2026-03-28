@@ -424,12 +424,18 @@ async def create_inr_payment(order_id: str, current_user: User = Depends(get_cur
         raise HTTPException(status_code=404, detail="Order not found")
     
     try:
+        # Get customer phone from shipping address or use default
+        customer_phone = "9999999999"
+        if order.get('shipping_address') and order['shipping_address'].get('phone'):
+            customer_phone = order['shipping_address']['phone']
+        
         # Create Cashfree order
         cashfree_data = await cashfree.create_order({
             "order_id": order_id,
             "amount": order['total'],
             "user_id": current_user.id,
-            "customer_email": current_user.email
+            "customer_email": current_user.email,
+            "customer_phone": customer_phone
         })
         
         # Store payment in database
