@@ -3,13 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
-import { Calendar } from '../components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '../components/ui/popover';
-import { MapPin, Star, Users, Wifi, CalendarIcon, Bed } from 'lucide-react';
-import { format, addDays } from 'date-fns';
-import { useCart } from '../contexts/CartContext';
+import { MapPin, Star, Bed } from 'lucide-react';
 import { toast } from 'sonner';
-import { cn } from '../lib/utils';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -32,54 +27,6 @@ const Services = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const calculateNights = () => {
-    if (!checkIn || !checkOut) return 0;
-    const diffTime = Math.abs(checkOut - checkIn);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
-  };
-
-  const calculateTotal = (pricePerNight) => {
-    const nights = calculateNights();
-    return nights * pricePerNight;
-  };
-
-  const handleBookNow = (hotel) => {
-    if (!checkIn || !checkOut) {
-      toast.error('Please select check-in and check-out dates');
-      return;
-    }
-
-    const nights = calculateNights();
-    if (nights < 1) {
-      toast.error('Check-out must be after check-in');
-      return;
-    }
-
-    const total = calculateTotal(hotel.price_per_night);
-    
-    addToCart({
-      item_id: hotel.id,
-      item_type: 'hotel_booking',
-      name: `${hotel.name} - ${nights} night${nights > 1 ? 's' : ''}`,
-      price: total,
-      quantity: 1,
-      booking_details: {
-        check_in: checkIn.toISOString(),
-        check_out: checkOut.toISOString(),
-        guests: guests,
-        nights: nights,
-        room_type: hotel.room_type
-      }
-    });
-    
-    toast.success(`${hotel.name} added to cart!`);
-    setSelectedHotel(null);
-    setCheckIn(null);
-    setCheckOut(null);
-    setGuests(1);
   };
 
   if (loading) {
@@ -111,7 +58,8 @@ const Services = () => {
             {hotels.map((hotel) => (
               <Card
                 key={hotel.id}
-                className="group relative overflow-hidden bg-[#0F0F1C] border-white/5 hover:border-secondary/50 transition-all duration-300"
+                className="group relative overflow-hidden bg-[#0F0F1C] border-white/5 hover:border-secondary/50 transition-all duration-300 cursor-pointer"
+                onClick={() => navigate(`/hotels/${hotel.id}`)}
                 data-testid={`hotel-card-${hotel.id}`}
               >
                 <div className="aspect-video overflow-hidden bg-muted">
@@ -185,13 +133,15 @@ const Services = () => {
                     </div>
                     
                     <Button
-                      onClick={() => setSelectedHotel(hotel)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/hotels/${hotel.id}`);
+                      }}
                       className="bg-primary hover:bg-primary/90"
                       size="sm"
-                      data-testid={`book-hotel-${hotel.id}`}
+                      data-testid={`view-hotel-${hotel.id}`}
                     >
-                      <CalendarIcon className="h-4 w-4 mr-1" />
-                      Book Now
+                      View Details
                     </Button>
                   </div>
                 </div>
@@ -200,138 +150,6 @@ const Services = () => {
           </div>
         )}
       </div>
-
-      {/* Booking Modal */}
-      {selectedHotel && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setSelectedHotel(null)}>
-          <Card 
-            className="bg-[#0F0F1C]/95 border-primary/50 max-w-2xl w-full max-h-[90vh] overflow-y-auto" 
-            onClick={(e) => e.stopPropagation()}
-            data-testid="booking-modal"
-          >
-            <div className="p-6">
-              <h2 className="text-3xl font-orbitron font-bold text-white mb-4">
-                Book {selectedHotel.name}
-              </h2>
-              
-              <div className="grid md:grid-cols-2 gap-6 mb-6">
-                <div>
-                  <label className="text-white/80 font-rajdhani mb-2 block">Check-in Date</label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-full justify-start text-left font-mono bg-input border-white/10",
-                          !checkIn && "text-white/40"
-                        )}
-                        data-testid="check-in-picker"
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {checkIn ? format(checkIn, 'PPP') : 'Select date'}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0 bg-[#0F0F1C] border-white/10">
-                      <Calendar
-                        mode="single"
-                        selected={checkIn}
-                        onSelect={setCheckIn}
-                        disabled={(date) => date < new Date()}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-                
-                <div>
-                  <label className="text-white/80 font-rajdhani mb-2 block">Check-out Date</label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-full justify-start text-left font-mono bg-input border-white/10",
-                          !checkOut && "text-white/40"
-                        )}
-                        data-testid="check-out-picker"
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {checkOut ? format(checkOut, 'PPP') : 'Select date'}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0 bg-[#0F0F1C] border-white/10">
-                      <Calendar
-                        mode="single"
-                        selected={checkOut}
-                        onSelect={setCheckOut}
-                        disabled={(date) => date < (checkIn || new Date())}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-              </div>
-              
-              <div className="mb-6">
-                <label className="text-white/80 font-rajdhani mb-2 block">Number of Guests</label>
-                <div className="flex items-center gap-4">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => setGuests(Math.max(1, guests - 1))}
-                    className="bg-input border-white/10"
-                  >
-                    -
-                  </Button>
-                  <span className="text-2xl font-mono text-white w-12 text-center">{guests}</span>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => setGuests(Math.min(10, guests + 1))}
-                    className="bg-input border-white/10"
-                  >
-                    +
-                  </Button>
-                </div>
-              </div>
-              
-              {checkIn && checkOut && calculateNights() > 0 && (
-                <div className="bg-secondary/10 border border-secondary/30 rounded p-4 mb-6">
-                  <div className="flex justify-between text-white/80 font-rajdhani mb-2">
-                    <span>Duration:</span>
-                    <span className="font-mono">{calculateNights()} night{calculateNights() > 1 ? 's' : ''}</span>
-                  </div>
-                  <div className="flex justify-between text-white/80 font-rajdhani mb-2">
-                    <span>Price per night:</span>
-                    <span className="font-mono">${selectedHotel.price_per_night.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-xl font-bold text-primary font-mono pt-2 border-t border-white/10">
-                    <span>Total:</span>
-                    <span>${calculateTotal(selectedHotel.price_per_night).toFixed(2)}</span>
-                  </div>
-                </div>
-              )}
-              
-              <div className="flex gap-3">
-                <Button
-                  variant="outline"
-                  className="flex-1 border-white/20 text-white hover:bg-white/5"
-                  onClick={() => setSelectedHotel(null)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={() => handleBookNow(selectedHotel)}
-                  className="flex-1 bg-primary hover:bg-primary/90 font-orbitron uppercase"
-                  data-testid="confirm-booking-btn"
-                >
-                  Add to Cart
-                </Button>
-              </div>
-            </div>
-          </Card>
-        </div>
-      )}
     </div>
   );
 };
