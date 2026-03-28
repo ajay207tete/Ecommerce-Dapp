@@ -310,20 +310,33 @@ const Checkout = () => {
                 
                 <div className="pt-4">
                   <Label className="text-white/80 mb-3 block">Payment Method</Label>
+                  
+                  {!walletAddress && (
+                    <div className="bg-yellow-500/10 border border-yellow-500/30 rounded p-3 mb-3">
+                      <p className="text-xs text-yellow-500 font-rajdhani">
+                        ⚠️ Connect your TON wallet to enable crypto payments
+                      </p>
+                    </div>
+                  )}
+                  
                   <Select value={paymentMethod} onValueChange={setPaymentMethod}>
                     <SelectTrigger className="bg-input border-white/10 text-white" data-testid="payment-method-select">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-[#0F0F1C] border-white/10">
                       <SelectItem value="INR">Pay with INR (Cashfree)</SelectItem>
-                      <SelectItem value="btc">Bitcoin (BTC)</SelectItem>
-                      <SelectItem value="eth">Ethereum (ETH)</SelectItem>
-                      <SelectItem value="usdc">USDC</SelectItem>
-                      <SelectItem value="ton">TON</SelectItem>
+                      <SelectItem value="ton" disabled={!walletAddress}>TON (via Connected Wallet)</SelectItem>
+                      <SelectItem value="btc" disabled={!walletAddress}>Bitcoin (BTC)</SelectItem>
+                      <SelectItem value="eth" disabled={!walletAddress}>Ethereum (ETH)</SelectItem>
+                      <SelectItem value="usdc" disabled={!walletAddress}>USDC</SelectItem>
                     </SelectContent>
                   </Select>
                   <p className="text-xs text-white/40 mt-2 font-rajdhani">
-                    {paymentMethod === 'INR' ? 'Secure payment via Cashfree - UPI, Cards, Net Banking' : 'Crypto payment via NOWPayments'}
+                    {paymentMethod === 'INR' 
+                      ? 'Secure payment via Cashfree - UPI, Cards, Net Banking' 
+                      : paymentMethod === 'ton'
+                      ? '✓ Pay directly from your connected TON wallet'
+                      : 'Crypto payment via NOWPayments'}
                   </p>
                 </div>
                 
