@@ -267,12 +267,16 @@ const Checkout = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-[#0F0F1C] border-white/10">
-                      <SelectItem value="TON">TON</SelectItem>
-                      <SelectItem value="btc">Bitcoin</SelectItem>
-                      <SelectItem value="eth">Ethereum</SelectItem>
+                      <SelectItem value="INR">Pay with INR (Cashfree)</SelectItem>
+                      <SelectItem value="btc">Bitcoin (BTC)</SelectItem>
+                      <SelectItem value="eth">Ethereum (ETH)</SelectItem>
                       <SelectItem value="usdc">USDC</SelectItem>
+                      <SelectItem value="ton">TON</SelectItem>
                     </SelectContent>
                   </Select>
+                  <p className="text-xs text-white/40 mt-2 font-rajdhani">
+                    {paymentMethod === 'INR' ? 'Secure payment via Cashfree - UPI, Cards, Net Banking' : 'Crypto payment via NOWPayments'}
+                  </p>
                 </div>
                 
                 <Button
