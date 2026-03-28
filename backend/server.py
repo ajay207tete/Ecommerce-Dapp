@@ -258,6 +258,14 @@ async def get_services(category: Optional[str] = None):
     return services
 
 
+@api_router.get("/services/{service_id}")
+async def get_service(service_id: str):
+    service = await db.services.find_one({"id": service_id}, {"_id": 0})
+    if not service:
+        raise HTTPException(status_code=404, detail="Service not found")
+    return service
+
+
 @api_router.post("/services")
 async def create_service(service: Service, current_user: User = Depends(get_current_user)):
     if current_user.role != "admin":
