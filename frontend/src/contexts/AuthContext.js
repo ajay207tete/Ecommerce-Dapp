@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { useTonAddress, useTonConnectUI } from '@tonconnect/ui-react';
+import { useTonAddress, useTonConnectUI, useTonWallet } from '@tonconnect/ui-react';
 import axios from 'axios';
+import { toast } from 'sonner';
 
 const AuthContext = createContext();
 
@@ -11,6 +12,7 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
   const walletAddress = useTonAddress();
+  const wallet = useTonWallet();
   const [tonConnectUI] = useTonConnectUI();
 
   useEffect(() => {
@@ -20,6 +22,27 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     }
   }, [token]);
+
+  useEffect(() => {
+    // Monitor wallet connection status
+    const handleStatusChange = (walletInfo) => {
+      if (walletInfo) {
+        console.log('Wallet connected:', walletInfo);
+        toast.success('Wallet connected successfully!');
+      }
+    };
+
+    // Listen for connection changes
+    if (tonConnectUI) {
+      tonConnectUI.onStatusChange(handleStatusChange);
+    }
+
+    return () => {
+      if (tonConnectUI) {
+        tonConnectUI.onStatusChange(() => {});
+      }
+    };
+  }, [tonConnectUI]);
 
   useEffect(() => {
     // Update user wallet address when wallet connects
@@ -50,6 +73,7 @@ export const AuthProvider = ({ children }) => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setUser(prev => ({ ...prev, wallet_address: address }));
+      toast.success('Wallet linked to your account!');
     } catch (error) {
       console.error('Failed to update wallet:', error);
     }
@@ -87,13 +111,13 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
     setUser(null);
     localStorage.removeItem('token');
-    if (tonConnectUI.connected) {
+    if (tonConnectUI && tonConnectUI.connected) {
       tonConnectUI.disconnect();
     }
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, register, logout, loading, walletAddress, tonConnectUI }}>
+    <AuthContext.Provider value={{ user, token, login, register, logout, loading, walletAddress, wallet, tonConnectUI }}>
       {children}
     </AuthContext.Provider>
   );
