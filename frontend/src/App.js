@@ -23,7 +23,12 @@ const manifestUrl = 'https://chocolate-chemical-orangutan-457.mypinata.cloud/ipf
 
 function App() {
   return (
-    <TonConnectUIProvider manifestUrl={manifestUrl}>
+    <TonConnectUIProvider 
+      manifestUrl={manifestUrl}
+      actionsConfiguration={{
+        twaReturnUrl: 'https://t.me/YourBotName'
+      }}
+    >
       <AuthProvider>
         <CartProvider>
           <BrowserRouter>
