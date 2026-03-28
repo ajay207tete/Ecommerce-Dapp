@@ -127,7 +127,7 @@ const Checkout = () => {
           
           cashfree.checkout({
             paymentSessionId: paymentResponse.data.payment_session_id,
-            returnUrl: `${window.location.origin}/payment-success?order_id=${orderId}`
+            returnUrl: `${window.location.origin}/payment-success?order_id=${orderIdToProcess}`
           });
           
           toast.success('Redirecting to payment gateway...');
