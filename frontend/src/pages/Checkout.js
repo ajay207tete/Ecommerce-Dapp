@@ -157,7 +157,6 @@ const Checkout = () => {
                 {
                   address: paymentResponse.data.pay_address,
                   amount: String(Math.floor(paymentResponse.data.pay_amount * 1000000000)), // Convert to nanotons
-                  payload: '' // Optional: add comment/memo
                 }
               ]
             };
