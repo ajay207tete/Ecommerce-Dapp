@@ -71,7 +71,8 @@ const Products = () => {
             {products.map((product) => (
               <Card
                 key={product.id}
-                className="group relative overflow-hidden bg-[#0F0F1C] border-white/5 hover:border-secondary/50 transition-all duration-300"
+                className="group relative overflow-hidden bg-[#0F0F1C] border-white/5 hover:border-secondary/50 transition-all duration-300 cursor-pointer"
+                onClick={() => navigate(`/products/${product.id}`)}
                 data-testid={`product-card-${product.id}`}
               >
                 <div className="aspect-square overflow-hidden bg-muted">
