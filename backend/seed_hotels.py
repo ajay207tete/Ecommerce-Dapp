@@ -4,8 +4,8 @@ import os
 from datetime import datetime
 import uuid
 
-MONGO_URL = "mongodb://localhost:27017"
-DB_NAME = "thruster_db"
+MONGO_URL = "mongodb+srv://ajayte207_db_user:Ajayte207@cluster0.gohrt1h.mongodb.net/?appName=Cluster0"
+DB_NAME = "thruster_production"
 
 hotels = [
     {
