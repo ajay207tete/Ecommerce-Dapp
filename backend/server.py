@@ -342,24 +342,49 @@ async def get_orders(current_user: User = Depends(get_current_user)):
     return orders
 
 
-@api_router.post("/payments/create-ton")
-async def create_ton_payment(order_id: str, current_user: User = Depends(get_current_user)):
+@api_router.post("/payments/create-inr")
+async def create_inr_payment(order_id: str, current_user: User = Depends(get_current_user)):
+    """Create Cashfree INR payment"""
+    from payment_handler import cashfree
+    
     order = await db.orders.find_one({"id": order_id, "user_id": current_user.id}, {"_id": 0})
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
     
-    payment = Payment(
-        order_id=order_id,
-        amount=order['total'],
-        method="TON",
-        pay_address=os.getenv("DEPOSIT_WALLET_ADDRESS", "PLACEHOLDER_TON_ADDRESS")
-    )
-    
-    payment_doc = payment.model_dump()
-    payment_doc['created_at'] = payment_doc['created_at'].isoformat()
-    await db.payments.insert_one(payment_doc)
-    
-    return payment
+    try:
+        # Create Cashfree order
+        cashfree_data = await cashfree.create_order({
+            "order_id": order_id,
+            "amount": order['total'],
+            "user_id": current_user.id,
+            "customer_email": current_user.email
+        })
+        
+        # Store payment in database
+        payment = Payment(
+            order_id=order_id,
+            amount=order['total'],
+            currency="INR",
+            method="cashfree",
+            status="created",
+            payment_provider_id=cashfree_data.get("cf_order_id"),
+            pay_address=cashfree_data.get("payment_session_id")
+        )
+        
+        payment_doc = payment.model_dump()
+        payment_doc['created_at'] = payment_doc['created_at'].isoformat()
+        await db.payments.insert_one(payment_doc)
+        
+        return {
+            "payment_id": payment.id,
+            "payment_session_id": cashfree_data.get("payment_session_id"),
+            "order_id": order_id,
+            "amount": order['total'],
+            "currency": "INR"
+        }
+    except Exception as e:
+        logger.error(f"Cashfree payment error: {e}")
+        raise HTTPException(status_code=500, detail=f"Payment creation failed: {str(e)}")
 
 
 @api_router.post("/payments/create-crypto")
