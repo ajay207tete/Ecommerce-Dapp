@@ -143,7 +143,7 @@ const Checkout = () => {
 
         // Create NOWPayments payment
         paymentResponse = await axios.post(
-          `${API}/payments/create-crypto?order_id=${orderId}&pay_currency=${paymentMethod}`,
+          `${API}/payments/create-crypto?order_id=${orderIdToProcess}&pay_currency=${paymentMethod}`,
           {},
           { headers: { Authorization: `Bearer ${token}` } }
         );
