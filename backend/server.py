@@ -435,53 +435,153 @@ async def get_payment_status(payment_id: str, current_user: User = Depends(get_c
     return payment
 
 
+@api_router.post("/webhooks/cashfree")
+async def cashfree_webhook(request: Request):
+    """Handle Cashfree payment webhook"""
+    from payment_handler import cashfree, nft_minter
+    
+    body = await request.body()
+    timestamp = request.headers.get("x-webhook-timestamp", "")
+    signature = request.headers.get("x-webhook-signature", "")
+    
+    # Verify signature
+    if not cashfree.verify_webhook_signature(timestamp, body.decode(), signature):
+        raise HTTPException(status_code=401, detail="Invalid signature")
+    
+    try:
+        payload = json.loads(body)
+        event_type = payload.get("type")
+        data = payload.get("data", {})
+        
+        if event_type == "PAYMENT_SUCCESS_WEBHOOK":
+            order_id = data.get("order", {}).get("order_id")
+            payment_amount = data.get("payment", {}).get("payment_amount")
+            cf_payment_id = data.get("payment", {}).get("cf_payment_id")
+            
+            # Update payment status
+            await db.payments.update_one(
+                {"payment_provider_id": data.get("order", {}).get("cf_order_id")},
+                {
+                    "$set": {
+                        "status": "completed",
+                        "tx_hash": cf_payment_id,
+                        "updated_at": datetime.now(timezone.utc).isoformat()
+                    }
+                }
+            )
+            
+            # Update order status
+            await db.orders.update_one(
+                {"id": order_id},
+                {"$set": {"status": "paid"}}
+            )
+            
+            # Fetch order and payment for NFT minting
+            order = await db.orders.find_one({"id": order_id}, {"_id": 0})
+            payment = await db.payments.find_one({"payment_provider_id": data.get("order", {}).get("cf_order_id")}, {"_id": 0})
+            
+            if order and payment:
+                # Check if it's a hotel booking
+                has_hotel_booking = any(item.get('item_type') == 'hotel_booking' for item in order.get('items', []))
+                
+                if has_hotel_booking:
+                    # Mint hotel booking NFT
+                    for item in order['items']:
+                        if item.get('item_type') == 'hotel_booking':
+                            booking_details = item.get('booking_details', {})
+                            
+                            # Fetch hotel details
+                            hotel = await db.services.find_one({"id": item['item_id']}, {"_id": 0})
+                            if hotel:
+                                booking_details['hotel_name'] = hotel.get('name')
+                                booking_details['location'] = hotel.get('location')
+                                booking_details['room_type'] = booking_details.get('room_type', hotel.get('room_type'))
+                                booking_details['hotel_image'] = hotel.get('images', [''])[0]
+                            
+                            await nft_minter.mint_booking_nft(db, order, payment, booking_details)
+                else:
+                    # Mint product purchase NFT
+                    await nft_minter.mint_product_nft(db, order, payment)
+                
+                logger.info(f"✅ Payment completed and NFT minted for order {order_id}")
+        
+        return {"status": "received"}
+        
+    except Exception as e:
+        logger.error(f"Cashfree webhook error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @api_router.post("/webhooks/nowpayments")
 async def nowpayments_webhook(request: Request):
+    """Handle NOWPayments webhook with NFT minting"""
+    from payment_handler import nowpayments, nft_minter
+    
     body = await request.body()
     received_signature = request.headers.get("x-nowpayments-sig")
     
     if not received_signature:
         raise HTTPException(status_code=400, detail="Missing signature")
     
+    # Verify signature
+    if not nowpayments.verify_ipn_signature(body.decode(), received_signature):
+        raise HTTPException(status_code=401, detail="Invalid signature")
+    
     try:
         payload = json.loads(body)
     except json.JSONDecodeError:
         raise HTTPException(status_code=400, detail="Invalid JSON")
     
-    sorted_payload = json.dumps(payload, sort_keys=True, separators=(',', ':'))
-    ipn_secret = os.getenv("NOWPAYMENTS_IPN_SECRET", "")
-    
-    if ipn_secret and ipn_secret != "YOUR_NOWPAYMENTS_IPN_SECRET":
-        computed_signature = hmac.new(
-            ipn_secret.encode(),
-            sorted_payload.encode(),
-            hashlib.sha512
-        ).hexdigest()
-        
-        if not hmac.compare_digest(computed_signature, received_signature):
-            raise HTTPException(status_code=401, detail="Invalid signature")
-    
-    payment_provider_id = payload.get("payment_id")
+    payment_provider_id = str(payload.get("payment_id"))
     status = payload.get("payment_status")
+    order_id = payload.get("order_id")
     
     await db.payments.update_one(
         {"payment_provider_id": payment_provider_id},
         {
             "$set": {
                 "status": status,
-                "tx_hash": payload.get("outcome_amount"),
+                "tx_hash": payload.get("pay_address"),
                 "updated_at": datetime.now(timezone.utc).isoformat()
             }
         }
     )
     
     if status == "finished":
+        # Update order
+        await db.orders.update_one(
+            {"id": order_id},
+            {"$set": {"status": "paid"}}
+        )
+        
+        # Fetch order and payment for NFT minting
+        order = await db.orders.find_one({"id": order_id}, {"_id": 0})
         payment = await db.payments.find_one({"payment_provider_id": payment_provider_id}, {"_id": 0})
-        if payment:
-            await db.orders.update_one(
-                {"id": payment['order_id']},
-                {"$set": {"status": "paid", "payment_id": payment['id']}}
-            )
+        
+        if order and payment:
+            # Check if it's a hotel booking
+            has_hotel_booking = any(item.get('item_type') == 'hotel_booking' for item in order.get('items', []))
+            
+            if has_hotel_booking:
+                # Mint hotel booking NFT
+                for item in order['items']:
+                    if item.get('item_type') == 'hotel_booking':
+                        booking_details = item.get('booking_details', {})
+                        
+                        # Fetch hotel details
+                        hotel = await db.services.find_one({"id": item['item_id']}, {"_id": 0})
+                        if hotel:
+                            booking_details['hotel_name'] = hotel.get('name')
+                            booking_details['location'] = hotel.get('location')
+                            booking_details['room_type'] = booking_details.get('room_type', hotel.get('room_type'))
+                            booking_details['hotel_image'] = hotel.get('images', [''])[0]
+                        
+                        await nft_minter.mint_booking_nft(db, order, payment, booking_details)
+            else:
+                # Mint product purchase NFT
+                await nft_minter.mint_product_nft(db, order, payment)
+            
+            logger.info(f"✅ Crypto payment completed and NFT minted for order {order_id}")
     
     return {"status": "received"}
 
