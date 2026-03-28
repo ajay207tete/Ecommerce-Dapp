@@ -180,7 +180,7 @@ const Checkout = () => {
             }
           } catch (txError) {
             console.error('Transaction error:', txError);
-            toast.error('Transaction failed. Please try again.');
+            toast.error('Transaction cancelled or failed');
             setLoading(false);
             return;
           }
