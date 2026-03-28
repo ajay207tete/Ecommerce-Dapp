@@ -188,7 +188,7 @@ const Checkout = () => {
       }
       
       setPaymentInfo(paymentResponse.data);
-      clearCart();
+      if (!orderId) clearCart();
       toast.success('Order created! Please complete payment.');
       
     } catch (error) {
