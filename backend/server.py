@@ -336,6 +336,55 @@ async def create_order(shipping_address: ShippingAddress, current_user: User = D
     return order
 
 
+class HotelBookingRequest(BaseModel):
+    hotel_id: str
+    hotel_name: str
+    check_in: str
+    check_out: str
+    guests: int
+    nights: int
+    room_type: str
+    total: float
+    location: Optional[str] = None
+    hotel_image: Optional[str] = None
+
+
+@api_router.post("/orders/hotel-booking")
+async def create_hotel_booking(booking: HotelBookingRequest, current_user: User = Depends(get_current_user)):
+    """Create hotel booking order directly without cart"""
+    
+    # Create order with hotel booking details
+    order = Order(
+        user_id=current_user.id,
+        items=[CartItem(
+            item_id=booking.hotel_id,
+            item_type="hotel_booking",
+            name=f"{booking.hotel_name} - {booking.nights} night{'s' if booking.nights > 1 else ''}",
+            price=booking.total,
+            quantity=1
+        )],
+        total=booking.total,
+        shipping_address=None  # Hotels don't need shipping
+    )
+    
+    order_doc = order.model_dump()
+    order_doc['created_at'] = order_doc['created_at'].isoformat()
+    order_doc['booking_details'] = {
+        "hotel_name": booking.hotel_name,
+        "location": booking.location,
+        "check_in": booking.check_in,
+        "check_out": booking.check_out,
+        "guests": booking.guests,
+        "nights": booking.nights,
+        "room_type": booking.room_type,
+        "hotel_image": booking.hotel_image
+    }
+    
+    await db.orders.insert_one(order_doc)
+    
+    return order
+
+
 @api_router.get("/orders")
 async def get_orders(current_user: User = Depends(get_current_user)):
     orders = await db.orders.find({"user_id": current_user.id}, {"_id": 0}).to_list(100)
