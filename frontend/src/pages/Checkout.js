@@ -61,13 +61,30 @@ const Checkout = () => {
       const orderId = orderResponse.data.id;
       
       let paymentResponse;
-      if (paymentMethod === 'TON') {
+      if (paymentMethod === 'INR') {
+        // Cashfree INR payment
         paymentResponse = await axios.post(
-          `${API}/payments/create-ton?order_id=${orderId}`,
+          `${API}/payments/create-inr?order_id=${orderId}`,
           {},
           { headers: { Authorization: `Bearer ${token}` } }
         );
+        
+        // Redirect to Cashfree payment page
+        if (paymentResponse.data.payment_session_id) {
+          const cashfreeSDK = window.Cashfree({
+            mode: 'production' // or 'sandbox' for testing
+          });
+          
+          cashfreeSDK.checkout({
+            paymentSessionId: paymentResponse.data.payment_session_id,
+            returnUrl: `${window.location.origin}/payment-success?order_id=${orderId}`
+          });
+          
+          toast.success('Redirecting to payment gateway...');
+          return;
+        }
       } else {
+        // NOWPayments crypto
         paymentResponse = await axios.post(
           `${API}/payments/create-crypto?order_id=${orderId}&pay_currency=${paymentMethod}`,
           {},
