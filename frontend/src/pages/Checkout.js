@@ -27,7 +27,7 @@ const Checkout = () => {
     phone: ''
   });
   
-  const [paymentMethod, setPaymentMethod] = useState('TON');
+  const [paymentMethod, setPaymentMethod] = useState('INR');
   const [loading, setLoading] = useState(false);
   const [paymentInfo, setPaymentInfo] = useState(null);
 
