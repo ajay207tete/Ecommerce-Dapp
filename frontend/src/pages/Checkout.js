@@ -192,8 +192,8 @@ const Checkout = () => {
       toast.success('Order created! Please complete payment.');
       
     } catch (error) {
-      console.error('Checkout error:', error);
-      toast.error(error.response?.data?.detail || 'Checkout failed');
+      console.error('Payment error:', error);
+      toast.error(error.response?.data?.detail || 'Payment failed');
     } finally {
       setLoading(false);
     }
