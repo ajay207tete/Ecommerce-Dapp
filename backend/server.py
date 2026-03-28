@@ -225,6 +225,21 @@ async def get_me(current_user: User = Depends(get_current_user)):
     return current_user
 
 
+@api_router.patch("/auth/update-wallet")
+async def update_wallet(wallet_data: dict, current_user: User = Depends(get_current_user)):
+    """Update user's wallet address"""
+    wallet_address = wallet_data.get("wallet_address")
+    if not wallet_address:
+        raise HTTPException(status_code=400, detail="Wallet address required")
+    
+    await db.users.update_one(
+        {"id": current_user.id},
+        {"$set": {"wallet_address": wallet_address}}
+    )
+    
+    return {"message": "Wallet updated successfully"}
+
+
 @api_router.get("/products")
 async def get_products(category: Optional[str] = None):
     query = {"category": category} if category else {}
