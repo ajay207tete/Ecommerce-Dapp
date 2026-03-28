@@ -141,7 +141,7 @@ const Checkout = () => {
           return;
         }
 
-        // Create NOWPayments payment
+        // Create NOWPayments payment or TON transaction
         paymentResponse = await axios.post(
           `${API}/payments/create-crypto?order_id=${orderIdToProcess}&pay_currency=${paymentMethod}`,
           {},
