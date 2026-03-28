@@ -19,7 +19,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import './App.css';
 
-const manifestUrl = `${window.location.origin}/tonconnect-manifest.json`;
+const manifestUrl = 'https://chocolate-chemical-orangutan-457.mypinata.cloud/ipfs/bafkreied3oyeppx52ihml6bpptptrvjsq52yxhbmgjjt2gp2gujcvlmcbm';
 
 function App() {
   return (
