@@ -75,7 +75,7 @@ const NFTGallery = () => {
                 className="bg-gradient-to-b from-[#1A1A2E] to-[#030014] border-primary/20 hover:border-primary/50 transition-all overflow-hidden group"
                 data-testid={`nft-${nft.id}`}
               >
-                <div className="aspect-square overflow-hidden bg-muted">
+                <div className="aspect-square overflow-hidden bg-muted relative">
                   {nft.metadata?.image ? (
                     <img
                       src={nft.metadata.image}
@@ -87,18 +87,89 @@ const NFTGallery = () => {
                       <Image className="h-20 w-20 text-white/20" />
                     </div>
                   )}
+                  
+                  {/* NFT Type Badge */}
+                  <div className="absolute top-4 right-4">
+                    <span className={`text-xs px-3 py-1 rounded-full font-mono ${
+                      nft.nft_type === 'hotel_booking' 
+                        ? 'bg-secondary text-black' 
+                        : 'bg-primary text-white'
+                    }`}>
+                      {nft.nft_type === 'hotel_booking' ? 'HOTEL' : 'PRODUCT'}
+                    </span>
+                  </div>
                 </div>
                 
                 <div className="p-4">
                   <h3 className="text-lg font-orbitron font-bold text-white mb-1">
                     {nft.metadata?.name || 'Unnamed NFT'}
                   </h3>
-                  <p className="text-sm text-white/60 font-rajdhani line-clamp-2">
+                  <p className="text-sm text-white/60 font-rajdhani line-clamp-2 mb-3">
                     {nft.metadata?.description || 'No description'}
                   </p>
+                  
+                  {/* Show booking details for hotel NFTs */}
+                  {nft.nft_type === 'hotel_booking' && nft.booking_details && (
+                    <div className="space-y-2 mb-3 p-3 bg-secondary/10 rounded border border-secondary/20">
+                      {nft.booking_details.hotel_name && (
+                        <div className="flex items-start gap-2">
+                          <span className="text-xs text-white/40 font-mono w-20">Hotel:</span>
+                          <span className="text-xs text-secondary font-rajdhani flex-1">{nft.booking_details.hotel_name}</span>
+                        </div>
+                      )}
+                      {nft.booking_details.check_in && (
+                        <div className="flex items-start gap-2">
+                          <span className="text-xs text-white/40 font-mono w-20">Check-in:</span>
+                          <span className="text-xs text-white font-mono flex-1">
+                            {new Date(nft.booking_details.check_in).toLocaleDateString()}
+                          </span>
+                        </div>
+                      )}
+                      {nft.booking_details.check_out && (
+                        <div className="flex items-start gap-2">
+                          <span className="text-xs text-white/40 font-mono w-20">Check-out:</span>
+                          <span className="text-xs text-white font-mono flex-1">
+                            {new Date(nft.booking_details.check_out).toLocaleDateString()}
+                          </span>
+                        </div>
+                      )}
+                      {nft.booking_details.nights && (
+                        <div className="flex items-start gap-2">
+                          <span className="text-xs text-white/40 font-mono w-20">Duration:</span>
+                          <span className="text-xs text-primary font-mono flex-1">
+                            {nft.booking_details.nights} night{nft.booking_details.nights > 1 ? 's' : ''}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  
+                  {/* Show key attributes */}
+                  {nft.metadata?.attributes && nft.metadata.attributes.length > 0 && (
+                    <div className="space-y-1 mb-3">
+                      {nft.metadata.attributes.slice(0, 3).map((attr, idx) => (
+                        <div key={idx} className="flex justify-between text-xs">
+                          <span className="text-white/40 font-mono">{attr.trait_type}:</span>
+                          <span className="text-white/80 font-rajdhani">
+                            {typeof attr.value === 'string' && attr.value.length > 20
+                              ? `${attr.value.substring(0, 20)}...`
+                              : attr.value}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
                   <div className="mt-3 pt-3 border-t border-white/10">
-                    <div className="text-xs text-secondary font-mono">
-                      {nft.status === 'minted' ? 'Minted' : 'Pending'}
+                    <div className="flex items-center justify-between">
+                      <div className="text-xs text-secondary font-mono">
+                        {nft.status === 'minted' ? '✓ Minted' : 'Pending'}
+                      </div>
+                      {nft.minted_at && (
+                        <div className="text-xs text-white/40 font-mono">
+                          {new Date(nft.minted_at).toLocaleDateString()}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
