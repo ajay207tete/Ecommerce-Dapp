@@ -16,11 +16,7 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const Services = () => {
   const [hotels, setHotels] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedHotel, setSelectedHotel] = useState(null);
-  const [checkIn, setCheckIn] = useState(null);
-  const [checkOut, setCheckOut] = useState(null);
-  const [guests, setGuests] = useState(1);
-  const { addToCart } = useCart();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchHotels();
