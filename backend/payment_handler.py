@@ -14,11 +14,11 @@ class CashfreePayment:
         self.client_id = os.getenv("CASHFREE_CLIENT_ID")
         self.client_secret = os.getenv("CASHFREE_CLIENT_SECRET")
         self.env = os.getenv("CASHFREE_ENV", "production")
-        self.base_url = "https://api.cashfree.com" if self.env == "production" else "https://sandbox.cashfree.com"
+        self.base_url = "https://api.cashfree.com/pg" if self.env == "production" else "https://sandbox.cashfree.com/pg"
     
     async def create_order(self, order_data: Dict[str, Any]) -> Dict[str, Any]:
         """Create Cashfree order"""
-        url = f"{self.base_url}/pg/orders"
+        url = f"{self.base_url}/orders"
         
         headers = {
             "x-client-id": self.client_id,
@@ -27,25 +27,47 @@ class CashfreePayment:
             "Content-Type": "application/json"
         }
         
+        # Ensure customer phone is valid
+        customer_phone = order_data.get("customer_phone", "9999999999")
+        if not customer_phone or len(customer_phone) < 10:
+            customer_phone = "9999999999"
+        
         payload = {
             "order_id": order_data["order_id"],
-            "order_amount": order_data["amount"],
+            "order_amount": float(order_data["amount"]),
             "order_currency": "INR",
             "customer_details": {
-                "customer_id": order_data["user_id"],
+                "customer_id": order_data["user_id"][:50],  # Max 50 chars
                 "customer_email": order_data["customer_email"],
-                "customer_phone": order_data.get("customer_phone", "9999999999")
+                "customer_phone": customer_phone
             },
             "order_meta": {
-                "return_url": f"{os.getenv('FRONTEND_URL')}/payment-success?order_id={order_data['order_id']}",
-                "notify_url": f"{os.getenv('FRONTEND_URL', 'http://localhost:8001')}/api/webhooks/cashfree"
+                "return_url": f"{os.getenv('FRONTEND_URL', 'http://localhost:3000')}/payment-success?order_id={order_data['order_id']}"
             }
         }
         
+        # Add notify URL if webhook is configured
+        webhook_url = os.getenv('FRONTEND_URL', 'http://localhost:8001')
+        if webhook_url:
+            payload["order_meta"]["notify_url"] = f"{webhook_url}/api/webhooks/cashfree"
+        
         async with httpx.AsyncClient(timeout=30.0) as client:
-            response = await client.post(url, json=payload, headers=headers)
-            response.raise_for_status()
-            return response.json()
+            try:
+                response = await client.post(url, json=payload, headers=headers)
+                
+                # Log response for debugging
+                print(f"Cashfree Response Status: {response.status_code}")
+                print(f"Cashfree Response: {response.text}")
+                
+                response.raise_for_status()
+                return response.json()
+            except httpx.HTTPStatusError as e:
+                error_detail = e.response.text
+                print(f"Cashfree Error: {error_detail}")
+                raise Exception(f"Cashfree API error: {error_detail}")
+            except Exception as e:
+                print(f"Cashfree Request Error: {str(e)}")
+                raise
     
     async def get_order_status(self, order_id: str) -> Dict[str, Any]:
         """Get Cashfree order status"""
