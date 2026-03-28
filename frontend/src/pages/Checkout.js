@@ -271,6 +271,10 @@ const Checkout = () => {
       <div className="container mx-auto max-w-4xl">
         <h1 className="text-5xl font-bold font-orbitron uppercase mb-8 text-white">Checkout</h1>
 
+        {!walletAddress && (
+          <WalletConnectionHelp />
+        )}
+
         <div className="grid md:grid-cols-2 gap-8">
           <div>
             <Card className="bg-[#0F0F1C]/80 backdrop-blur-md border-white/10 p-6">
