@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { useTonAddress } from '@tonconnect/ui-react';
+import { useTonAddress, useTonConnectUI } from '@tonconnect/ui-react';
 import axios from 'axios';
 
 const AuthContext = createContext();
@@ -11,6 +11,7 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
   const walletAddress = useTonAddress();
+  const [tonConnectUI] = useTonConnectUI();
 
   useEffect(() => {
     if (token) {
@@ -19,6 +20,13 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     }
   }, [token]);
+
+  useEffect(() => {
+    // Update user wallet address when wallet connects
+    if (walletAddress && user && user.wallet_address !== walletAddress) {
+      updateUserWallet(walletAddress);
+    }
+  }, [walletAddress, user]);
 
   const fetchUser = async () => {
     try {
@@ -31,6 +39,19 @@ export const AuthProvider = ({ children }) => {
       logout();
     } finally {
       setLoading(false);
+    }
+  };
+
+  const updateUserWallet = async (address) => {
+    try {
+      await axios.patch(
+        `${API}/auth/update-wallet`,
+        { wallet_address: address },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setUser(prev => ({ ...prev, wallet_address: address }));
+    } catch (error) {
+      console.error('Failed to update wallet:', error);
     }
   };
 
@@ -66,10 +87,13 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
     setUser(null);
     localStorage.removeItem('token');
+    if (tonConnectUI.connected) {
+      tonConnectUI.disconnect();
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, register, logout, loading, walletAddress }}>
+    <AuthContext.Provider value={{ user, token, login, register, logout, loading, walletAddress, tonConnectUI }}>
       {children}
     </AuthContext.Provider>
   );
