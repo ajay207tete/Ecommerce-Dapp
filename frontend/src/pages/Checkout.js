@@ -408,19 +408,28 @@ const Checkout = () => {
               <h2 className="text-2xl font-orbitron text-white mb-6">Order Summary</h2>
               
               <div className="space-y-3 mb-6">
-                {cartItems.map((item) => (
-                  <div key={item.item_id} className="flex justify-between text-white/80 font-rajdhani">
-                    <span>{item.name} x {item.quantity}</span>
-                    <span className="font-mono">${(item.price * item.quantity).toFixed(2)}</span>
-                  </div>
-                ))}
+                {existingOrder ? (
+                  existingOrder.items.map((item) => (
+                    <div key={item.item_id} className="flex justify-between text-white/80 font-rajdhani">
+                      <span>{item.name}</span>
+                      <span className="font-mono">${(item.price * item.quantity).toFixed(2)}</span>
+                    </div>
+                  ))
+                ) : (
+                  cartItems.map((item) => (
+                    <div key={item.item_id} className="flex justify-between text-white/80 font-rajdhani">
+                      <span>{item.name} x {item.quantity}</span>
+                      <span className="font-mono">${(item.price * item.quantity).toFixed(2)}</span>
+                    </div>
+                  ))
+                )}
               </div>
               
               <div className="border-t border-white/10 pt-4">
                 <div className="flex justify-between items-center">
                   <span className="text-xl font-orbitron text-white">Total</span>
                   <span className="text-3xl font-bold text-primary font-mono" data-testid="checkout-total">
-                    ${total.toFixed(2)}
+                    ${(existingOrder ? orderTotal : total).toFixed(2)}
                   </span>
                 </div>
               </div>
