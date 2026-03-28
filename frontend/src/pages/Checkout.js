@@ -173,7 +173,7 @@ const Checkout = () => {
                 { headers: { Authorization: `Bearer ${token}` } }
               );
               
-              clearCart();
+              if (!orderId) clearCart();
               navigate('/dashboard');
               toast.success('Order placed! Payment is being processed.');
               return;
