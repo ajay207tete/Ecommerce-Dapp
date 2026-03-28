@@ -1,9 +1,9 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { TonConnectButton, useTonAddress } from '@tonconnect/ui-react';
+import { TonConnectButton, useTonAddress, useTonConnectUI } from '@tonconnect/ui-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { Button } from './ui/button';
-import { ShoppingCart, User, LogOut, LayoutDashboard, Gift } from 'lucide-react';
+import { ShoppingCart, User, LogOut, LayoutDashboard, Gift, Wallet } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +16,7 @@ const Navbar = () => {
   const { cartItems } = useCart();
   const navigate = useNavigate();
   const walletAddress = useTonAddress();
+  const [tonConnectUI] = useTonConnectUI();
 
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -37,7 +38,7 @@ const Navbar = () => {
             </Link>
             <Link to="/services" data-testid="nav-services-link">
               <Button variant="ghost" className="font-rajdhani text-white/80 hover:text-white">
-                Services
+                Hotels
               </Button>
             </Link>
             <Link to="/rewards" data-testid="nav-rewards-link">
@@ -58,8 +59,17 @@ const Navbar = () => {
               </Button>
             </Link>
 
-            <div className="border-l border-white/10 pl-4">
+            <div className="border-l border-white/10 pl-4 flex items-center gap-3">
               <TonConnectButton />
+              
+              {walletAddress && (
+                <div className="hidden md:flex items-center gap-2 px-3 py-1 bg-secondary/10 border border-secondary/30 rounded-lg">
+                  <Wallet className="h-4 w-4 text-secondary" />
+                  <span className="text-xs font-mono text-secondary">
+                    {walletAddress.slice(0, 4)}...{walletAddress.slice(-4)}
+                  </span>
+                </div>
+              )}
             </div>
 
             {user ? (
