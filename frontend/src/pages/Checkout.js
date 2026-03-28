@@ -40,6 +40,28 @@ const Checkout = () => {
   const [loading, setLoading] = useState(false);
   const [paymentInfo, setPaymentInfo] = useState(null);
 
+  useEffect(() => {
+    // If order_id is provided, fetch the existing order
+    if (orderId) {
+      fetchOrder();
+    }
+  }, [orderId]);
+
+  const fetchOrder = async () => {
+    try {
+      const response = await axios.get(`${API}/orders`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const order = response.data.find(o => o.id === orderId);
+      if (order) {
+        setExistingOrder(order);
+        setOrderTotal(order.total);
+      }
+    } catch (error) {
+      console.error('Failed to fetch order:', error);
+    }
+  };
+
   const handleInputChange = (e) => {
     setShippingInfo({ ...shippingInfo, [e.target.name]: e.target.value });
   };
@@ -53,6 +75,13 @@ const Checkout = () => {
       return;
     }
 
+    // For hotel bookings, order already exists
+    if (orderId && existingOrder) {
+      processPayment(orderId);
+      return;
+    }
+
+    // For cart-based checkout
     if (cartItems.length === 0) {
       toast.error('Your cart is empty');
       return;
@@ -67,8 +96,20 @@ const Checkout = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
-      const orderId = orderResponse.data.id;
+      const newOrderId = orderResponse.data.id;
+      await processPayment(newOrderId);
       
+    } catch (error) {
+      console.error('Checkout error:', error);
+      toast.error(error.response?.data?.detail || 'Checkout failed');
+      setLoading(false);
+    }
+  };
+
+  const processPayment = async (orderIdToProcess) => {
+    setLoading(true);
+    
+    try {
       let paymentResponse;
       if (paymentMethod === 'INR') {
         // Cashfree INR payment
