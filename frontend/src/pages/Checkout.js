@@ -71,11 +71,11 @@ const Checkout = () => {
         
         // Redirect to Cashfree payment page
         if (paymentResponse.data.payment_session_id) {
-          const cashfreeSDK = window.Cashfree({
-            mode: 'production' // or 'sandbox' for testing
+          const cashfree = window.Cashfree({
+            mode: 'production'
           });
           
-          cashfreeSDK.checkout({
+          cashfree.checkout({
             paymentSessionId: paymentResponse.data.payment_session_id,
             returnUrl: `${window.location.origin}/payment-success?order_id=${orderId}`
           });
@@ -84,12 +84,58 @@ const Checkout = () => {
           return;
         }
       } else {
-        // NOWPayments crypto
+        // Check if wallet is connected for crypto payments
+        if (!walletAddress) {
+          toast.error('Please connect your TON wallet first');
+          setLoading(false);
+          return;
+        }
+
+        // Create NOWPayments payment
         paymentResponse = await axios.post(
           `${API}/payments/create-crypto?order_id=${orderId}&pay_currency=${paymentMethod}`,
           {},
           { headers: { Authorization: `Bearer ${token}` } }
         );
+
+        // If TON payment, initiate transaction via wallet
+        if (paymentMethod === 'ton') {
+          try {
+            const transaction = {
+              validUntil: Math.floor(Date.now() / 1000) + 600, // 10 minutes
+              messages: [
+                {
+                  address: paymentResponse.data.pay_address,
+                  amount: String(Math.floor(paymentResponse.data.pay_amount * 1000000000)), // Convert to nanotons
+                  payload: '' // Optional: add comment/memo
+                }
+              ]
+            };
+
+            // Send transaction via connected wallet
+            const result = await tonConnectUI.sendTransaction(transaction);
+            
+            if (result) {
+              toast.success('Payment sent! Waiting for confirmation...');
+              // Update payment with transaction hash
+              await axios.patch(
+                `${API}/payments/${paymentResponse.data.id}/update-tx`,
+                { tx_hash: result.boc },
+                { headers: { Authorization: `Bearer ${token}` } }
+              );
+              
+              clearCart();
+              navigate('/dashboard');
+              toast.success('Order placed! Payment is being processed.');
+              return;
+            }
+          } catch (txError) {
+            console.error('Transaction error:', txError);
+            toast.error('Transaction failed. Please try again.');
+            setLoading(false);
+            return;
+          }
+        }
       }
       
       setPaymentInfo(paymentResponse.data);
