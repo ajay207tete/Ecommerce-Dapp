@@ -95,7 +95,7 @@ const HotelDetail = () => {
       );
 
       // Redirect to checkout with order ID
-      navigate(`/hotel-checkout/${orderResponse.data.id}`);
+      navigate(`/checkout?order_id=${orderResponse.data.id}&type=hotel`);
     } catch (error) {
       console.error('Booking error:', error);
       toast.error(error.response?.data?.detail || 'Booking failed');
