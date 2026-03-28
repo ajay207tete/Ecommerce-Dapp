@@ -11,6 +11,7 @@ import { Card } from '../components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
+import WalletConnectionHelp from '../components/WalletConnectionHelp';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
