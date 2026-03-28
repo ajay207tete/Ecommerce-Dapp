@@ -49,8 +49,21 @@ export const CartProvider = ({ children }) => {
           headers: { Authorization: `Bearer ${token}` }
         });
         setCartItems(response.data.items || []);
+        await fetchCart(); // Refresh cart after adding
       } catch (error) {
         console.error('Failed to add to cart:', error);
+        // Fallback to local storage on error
+        setCartItems(prev => {
+          const existing = prev.find(i => i.item_id === item.item_id);
+          if (existing) {
+            return prev.map(i =>
+              i.item_id === item.item_id
+                ? { ...i, quantity: i.quantity + item.quantity }
+                : i
+            );
+          }
+          return [...prev, item];
+        });
       }
     } else {
       setCartItems(prev => {
