@@ -19,14 +19,37 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import './App.css';
 
-const manifestUrl = 'https://chocolate-chemical-orangutan-457.mypinata.cloud/ipfs/bafkreied3oyeppx52ihml6bpptptrvjsq52yxhbmgjjt2gp2gujcvlmcbm';
+// Use environment variable or deployed URL for manifest
+const manifestUrl = process.env.REACT_APP_TON_MANIFEST_URL || 
+  'https://ton-ecommerce-1.preview.emergentagent.com/tonconnect-manifest.json';
 
 function App() {
   return (
     <TonConnectUIProvider 
       manifestUrl={manifestUrl}
+      walletsListConfiguration={{
+        includeWallets: [
+          {
+            appName: "tonkeeper",
+            name: "Tonkeeper",
+            imageUrl: "https://tonkeeper.com/assets/tonconnect-icon.png",
+            aboutUrl: "https://tonkeeper.com",
+            universalLink: "https://app.tonkeeper.com/ton-connect",
+            bridgeUrl: "https://bridge.tonapi.io/bridge",
+            platforms: ["ios", "android", "chrome", "firefox"]
+          },
+          {
+            appName: "mytonwallet",
+            name: "MyTonWallet",
+            imageUrl: "https://static.mytonwallet.io/icon-256.png",
+            aboutUrl: "https://mytonwallet.io",
+            universalLink: "https://connect.mytonwallet.org",
+            platforms: ["chrome", "firefox", "safari"]
+          }
+        ]
+      }}
       actionsConfiguration={{
-        twaReturnUrl: 'https://t.me/YourBotName'
+        twaReturnUrl: 'https://t.me/ThrusterBot'
       }}
     >
       <AuthProvider>
