@@ -114,7 +114,7 @@ const Checkout = () => {
       if (paymentMethod === 'INR') {
         // Cashfree INR payment
         paymentResponse = await axios.post(
-          `${API}/payments/create-inr?order_id=${orderId}`,
+          `${API}/payments/create-inr?order_id=${orderIdToProcess}`,
           {},
           { headers: { Authorization: `Bearer ${token}` } }
         );
