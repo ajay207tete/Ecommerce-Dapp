@@ -33,7 +33,8 @@ const HotelDetail = () => {
 
   const fetchHotel = async () => {
     try {
-      const response = await axios.get(`${API}/services/${id}`);
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api
+/services/${id}`);
       setHotel(response.data);
     } catch (error) {
       console.error('Failed to fetch hotel:', error);
