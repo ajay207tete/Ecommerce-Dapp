@@ -20,8 +20,7 @@ import Register from './pages/Register';
 import './App.css';
 
 // Use environment variable or deployed URL for manifest
-const manifestUrl = process.env.REACT_APP_TON_MANIFEST_URL || 
-  'https://ton-ecommerce-1.preview.emergentagent.com/tonconnect-manifest.json';
+const manifestUrl = process.env.REACT_APP_TON_MANIFEST_URL || 'https://ecommerce-dapp-i9u9.vercel.app/tonconnect-manifest.json';
 
 function App() {
   return (
