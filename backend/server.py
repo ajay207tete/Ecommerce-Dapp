@@ -801,7 +801,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_origins=["https://ecommerce-dapp-i9u9.vercel.app/",
 "http://localhost:3000",
-    "http://localhost:19006"
+    "http://localhost:19006"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
