@@ -1,0 +1,30 @@
+{
+"build command":"cd frontend && npm run build",
+"output directory":"frontend/build",
+"install command":"cd frontend && npm install",
+"framework":"create-react-app",
+"env":
+{
+"REACT_APP_BACKEND_URL":"https://thruster-dapp.onrender.com",
+"REACT_APP_TON_MANIFEST_URL":"https://ecommerce-dapp-i9u9.vercel.app/tonconnect-manifest.json",
+"CI":"false"
+},
+"routes":[
+{
+"src":"/tonconnect-manifest.json",
+"dest":"/tonconnect-manifest.json"
+},
+{
+"src":"/static/(.*)",
+"dest":"/static/$1"
+},
+{
+"src":"/(.*\\.(js|css|json|ico|png|jpeg|svg|woff|woff2))"
+"dest":"/$1"
+},
+{
+"src":"/(.*)",
+"dest":"/index.html"
+}
+]
+}
