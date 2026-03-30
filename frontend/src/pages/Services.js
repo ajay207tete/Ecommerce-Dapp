@@ -6,7 +6,7 @@ import { Card } from '../components/ui/card';
 import { MapPin, Star, Bed } from 'lucide-react';
 import { toast } from 'sonner';
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const API =`https://thruster-dapp.onrender.com/api`;
 
 const Services = () => {
   const [hotels, setHotels] = useState([]);
@@ -19,7 +19,7 @@ const Services = () => {
 
   const fetchHotels = async () => {
     try {
-      const response = await axios.get(`https://thruster-dapp.onrender.com/api/services`);
+      const response = await axios.get(`${API}/services`);
       setHotels(response.data);
     } catch (error) {
       console.error('Failed to fetch hotels:', error);
