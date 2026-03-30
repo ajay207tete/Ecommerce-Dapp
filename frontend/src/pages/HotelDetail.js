@@ -11,7 +11,7 @@ import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { cn } from '../lib/utils';
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const API = `https://thruster-dapp.onrender.com/api`;
 
 const HotelDetail = () => {
   const { id } = useParams();
@@ -33,7 +33,7 @@ const HotelDetail = () => {
 
   const fetchHotel = async () => {
     try {
-      const response = await axios.get('https://thruster-dapp.onrender.com/api/services/${id}`);
+      const response = await axios.get('${API}/services/${id}`);
       setHotel(response.data);
     } catch (error) {
       console.error('Failed to fetch hotel:', error);
