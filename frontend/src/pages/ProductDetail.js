@@ -25,7 +25,7 @@ const ProductDetail = () => {
 
   const fetchProduct = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/products/${id}`);
+      const response = await axios.get(`https://thruster-dapp.onrender.com/api/products/${id}`);
       setProduct(response.data);
     } catch (error) {
       console.error('Failed to fetch product:', error);
