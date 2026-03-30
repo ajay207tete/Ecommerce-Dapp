@@ -7,7 +7,8 @@ import { Plus, ShoppingCart } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { toast } from 'sonner';
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const API = 'https://thruster-dapp.onrender.com
+/api`;
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -21,7 +22,7 @@ const Products = () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get(`https://thruster-dapp.onrender.com/api/products`);
+      const response = await axios.get(`${API}products`);
       setProducts(response.data);
     } catch (error) {
       console.error('Failed to fetch products:', error);
