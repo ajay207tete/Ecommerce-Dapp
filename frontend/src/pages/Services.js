@@ -6,7 +6,7 @@ import { Card } from '../components/ui/card';
 import { MapPin, Star, Bed } from 'lucide-react';
 import { toast } from 'sonner';
 
-const API =`https://thruster-dapp.onrender.com/api`;
+const API =`${process.env.REACT_APP_BACKEND_URL}/api';
 
 const Services = () => {
   const [hotels, setHotels] = useState([]);
