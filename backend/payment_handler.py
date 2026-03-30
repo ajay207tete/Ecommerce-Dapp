@@ -47,7 +47,7 @@ class CashfreePayment:
         }
         
         # Add notify URL if webhook is configured
-        webhook_url = os.getenv('BACKEND_URL')
+        webhook_url = os.getenv('FRONTEND_URL')
         if webhook_url:
             payload["order_meta"]["notify_url"] = f"{webhook_url}/api/webhooks/cashfree"
         
