@@ -7,7 +7,7 @@ import { ShoppingCart, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { toast } from 'sonner';
 
-const API = `https://thruster-dapp.onrender.com/api`;
+const API = `${process.env.REACT_APP_BACKEND_URL}/api';
 
 const ProductDetail = () => {
   const { id } = useParams();
