@@ -11,7 +11,7 @@ import { format } from 'date-fns';
 import { toast } from 'sonner';
 import { cn } from '../lib/utils';
 
-const API = `https://thruster-dapp.onrender.com/api`;
+const API = `${process.env.REACT_APP_BACKEND_URL}/api';
 
 const HotelDetail = () => {
   const { id } = useParams();
