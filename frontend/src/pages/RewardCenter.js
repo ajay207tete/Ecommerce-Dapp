@@ -18,9 +18,11 @@ const RewardCenter = () => {
   const navigate = useNavigate();
 
   const socialTasks = [
-    { id: 'telegram', type: 'telegram', name: 'Follow on Telegram', url: 'https://t.me/thruster', reward: 10 },
-    { id: 'instagram', type: 'instagram', name: 'Follow on Instagram', url: 'https://instagram.com/thruster', reward: 10 },
-    { id: 'youtube', type: 'youtube', name: 'Subscribe on YouTube', url: 'https://youtube.com/@thruster', reward: 15 },
+    { id: 'telegram', type: 'telegram', name: 'Follow on Telegram', url:'https://t.me/thrustercommunity'
+, reward: 10 },
+    { id: 'instagram', type: 'instagram', name: 'Follow on Instagram', url:'https://www.instagram.com/thruster.co.in?igsh=cTF2MG05ZDczNHU='
+, reward: 10 },
+    { id: 'youtube', type: 'youtube', name: 'Subscribe on YouTube', url:'https://youtube.com/@thruster-yt?si=Hy1cOUrDoCZN37q-', reward: 15 },
   ];
 
   useEffect(() => {
