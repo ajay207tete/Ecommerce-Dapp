@@ -7,8 +7,7 @@ import { Plus, ShoppingCart } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { toast } from 'sonner';
 
-const API = 'https://thruster-dapp.onrender.com
-/api`;
+const API="https://thruster-dapp.onrender.com/api";
 
 const Products = () => {
   const [products, setProducts] = useState([]);
