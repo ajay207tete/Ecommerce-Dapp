@@ -47,7 +47,7 @@ class CashfreePayment:
         }
         
         # Add notify URL if webhook is configured
-        webhook_url = os.getenv('FRONTEND_URL', 'http://localhost:8001')
+        webhook_url = os.getenv('BACKEND_URL')
         if webhook_url:
             payload["order_meta"]["notify_url"] = f"{webhook_url}/api/webhooks/cashfree"
         
@@ -124,7 +124,7 @@ class NOWPaymentsHandler:
             "pay_currency": order_data.get("pay_currency", "btc"),
             "order_id": order_data["order_id"],
             "order_description": order_data.get("description", f"Order {order_data['order_id']}"),
-            "ipn_callback_url": f"{os.getenv('FRONTEND_URL', 'http://localhost:8001')}/api/webhooks/nowpayments"
+            "ipn_callback_url": f"{os.getenv('BACKEND_URL')}/api/webhooks/nowpayments"
         }
         
         async with httpx.AsyncClient(timeout=30.0) as client:
