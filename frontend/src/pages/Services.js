@@ -19,8 +19,7 @@ const Services = () => {
 
   const fetchHotels = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api
-/services`);
+      const response = await axios.get(`{process.env.REACT_APP_BACKEND_URL}/api/services`);
       setHotels(response.data);
     } catch (error) {
       console.error('Failed to fetch hotels:', error);
