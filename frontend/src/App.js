@@ -54,7 +54,8 @@ function App() {
       <AuthProvider>
         <CartProvider>
           <BrowserRouter>
-            <div className="App min-h-screen bg-background scanline-bg noise-texture">
+            <div className="w-full overflow-x-hidden bg-background text-foreground">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <Navbar />
               <Routes>
                 <Route path="/" element={<Home />} />
@@ -73,6 +74,7 @@ function App() {
               </Routes>
               <Toaster position="top-right" />
             </div>
+           </div>
           </BrowserRouter>
         </CartProvider>
       </AuthProvider>
