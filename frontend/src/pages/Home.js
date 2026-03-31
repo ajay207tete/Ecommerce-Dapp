@@ -26,15 +26,15 @@ const Home = () => {
           }} />
         </div>
         
-        <div className="container mx-auto relative z-10 animate-fade-in">
-          <div className="max-w-4xl mx-auto text-center">
+        <div className="w-full max-w-7xl mx-auto px-4 relative z-10 animate-fade-in">
+          <div className="max-w-4xl mx-auto px-4 text-center">
             <div className="inline-block mb-6">
               <span className="text-secondary font-mono text-sm tracking-widest uppercase px-4 py-2 border border-secondary/50 rounded-sm glow-secondary">
                 Web3 E-Commerce on TON
               </span>
             </div>
             
-            <h1 className="text-6xl md:text-8xl font-black font-orbitron uppercase tracking-tighter mb-6 glow-text-primary animate-glitch" data-testid="hero-title">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-black font-orbitron uppercase tracking-tighter mb-6 glow-text-primary animate-glitch" data-testid="hero-title">
               THRUSTER
             </h1>
             
@@ -44,7 +44,7 @@ const Home = () => {
               Earn rewards. Collect exclusive NFTs. Own your digital destiny.
             </p>
             
-            <div className="flex gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/products" data-testid="hero-shop-now-btn">
                 <Button className="bg-primary hover:bg-primary/90 text-white font-orbitron uppercase tracking-wider px-8 py-6 text-lg clip-corner glow-primary">
                   Shop Now
@@ -65,11 +65,11 @@ const Home = () => {
       </section>
 
       <section className="py-24 px-4">
-        <div className="container mx-auto max-w-4xl mb-12">
+        <div className="w-full max-w-4xl mx-auto px-4 mb-12">
           <WalletConnectionTest />
         </div>
 
-        <div className="container mx-auto">
+        <div className="w-full max-w-7xl mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-6xl font-bold font-orbitron uppercase mb-4 text-white">
               Why THRUSTER?
@@ -77,7 +77,7 @@ const Home = () => {
             <p className="text-lg text-white/60 font-rajdhani">The most advanced Web3 marketplace on TON</p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-col-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="bg-[#0F0F1C]/80 backdrop-blur-md border border-white/10 hover:border-primary/50 transition-all duration-300 p-8 rounded-lg group" data-testid="feature-crypto-payments">
               <div className="mb-4 text-primary">
                 <Zap className="h-12 w-12" />
@@ -114,7 +114,7 @@ const Home = () => {
       </section>
 
       <section className="py-24 px-4 bg-gradient-to-b from-transparent to-[#1A1A2E]">
-        <div className="container mx-auto text-center">
+        <div className="w-full max-w-7xl mx-auto px-4 text-center">
           <h2 className="text-4xl md:text-6xl font-bold font-orbitron uppercase mb-6 text-white">
             Ready to Launch?
           </h2>
