@@ -9,7 +9,12 @@
 .glow-text-secondary {
   text-shadow: 0 0 20px rgba(8, 217, 214, 0.7);
 }
-
+@media(max-width:640px){
+.clip-corner
+.clip-corner-all{
+clip-path:none !important;
+}
+}
 .clip-corner {
   clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%);
 }
