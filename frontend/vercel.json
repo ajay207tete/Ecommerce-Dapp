@@ -19,7 +19,7 @@
 "dest":"/static/$1"
 },
 {
-"src":"/(.*\\.(js|css|json|ico|png|jpeg|svg|woff|woff2))"
+"src":"/(.*\\.(js|css|json|ico|png|jpeg|svg|woff|woff2))",
 "dest":"/$1"
 },
 {
