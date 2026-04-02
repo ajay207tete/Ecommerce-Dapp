@@ -1,4 +1,4 @@
-import { useTonConnectUI, useTonAddress } from '@tonconnect/ui-react';
+import { useTonConnectUI, useTonAddress } from '.tonconnect/ui-react';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
