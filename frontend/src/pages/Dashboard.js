@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { Card } from '../components/ui/card';
 import { Package, Clock, CheckCircle, XCircle } from 'lucide-react';
 
-const API = ${process.env.REACT_APP_BACKEND_URL}/api;
+const API =`${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const Dashboard = () => {
 const { user, token } = useAuth();
@@ -23,8 +23,8 @@ fetchOrders();
 
 const fetchOrders = async () => {
 try {
-const response = await axios.get(${API}/orders, {
-headers: { Authorization: Bearer ${token} }
+const response = await axios.get(`${API}/orders`, {
+headers: { Authorization:` Bearer ${token}|}
 });
 setOrders(response.data);
 } catch (error) {
