@@ -30,7 +30,7 @@ const Navbar = () => {
             </div>
           </Link>
 
-          <div className="flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-6">
             <Link to="/products" data-testid="nav-products-link">
               <Button variant="ghost" className="font-rajdhani text-white/80 hover:text-white">
                 Products
