@@ -24,7 +24,7 @@ fetchOrders();
 const fetchOrders = async () => {
 try {
 const response = await axios.get(`${API}/orders`, {
-headers: { Authorization:` Bearer ${token}`}
+headers: { Authorization:`Bearer ${token}`}
 });
 setOrders(response.data);
 } catch (error) {
