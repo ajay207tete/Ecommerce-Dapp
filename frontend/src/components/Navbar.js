@@ -55,7 +55,7 @@ const Navbar = () => {
                     <LayoutDashboard className="mr-2 h-4 w-4" />
                     Dashboard
                   </DropdownMenuItem>
-                  </DropdownMenuItem onClick={() =>
+                  <DropdownMenuItem onClick={() =>
 navigate('/cart')} data-testid="nav-cart">
                   <ShoppingCart className="mr-2 h-4 w-4" /> Cart ({cartCount})
                   </DropdownMenuItem>
