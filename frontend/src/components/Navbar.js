@@ -25,7 +25,7 @@ const Navbar = () => {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2" data-testid="nav-home-link">
-            <div className="text-3xl font-orbitron font-black text-primary glow-text-primary uppercase tracking-tighter">
+            <div className="text-xl sm:2xl md:text-3xl font-orbitron font-black text-primary glow-text-primary uppercase tracking-tighter">
               THRUSTER
             </div>
           </Link>
