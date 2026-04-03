@@ -30,8 +30,10 @@ const Navbar = () => {
             </div>
           </Link>
 
-            <div className="border-l border-white/10 pl-4 flex items-center gap-3">
+            <div className="border-l border-white/10 pl-2 sm:pl-4 flex items-center gap-2">
+<div className="scale-75 sm:scale-90 md:scale-100 origin-right">
               <TonConnectButton />
+                </div>
               
               {walletAddress && (
                 <div className="hidden md:flex items-center gap-2 px-3 py-1 bg-secondary/10 border border-secondary/30 rounded-lg">
