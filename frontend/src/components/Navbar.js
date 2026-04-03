@@ -30,18 +30,6 @@ const Navbar = () => {
             </div>
           </Link>
 
-          <div className="flex items-center gap-6">
-            <Link to="/products" data-testid="nav-products-link">
-              <Button variant="ghost" className="font-rajdhani text-white/80 hover:text-white">
-                Products
-              </Button>
-            </Link>
-            <Link to="/services" data-testid="nav-services-link">
-              <Button variant="ghost" className="font-rajdhani text-white/80 hover:text-white">
-                Hotels
-              </Button>
-            </Link>
-
             <div className="border-l border-white/10 pl-4 flex items-center gap-3">
               <TonConnectButton />
               
