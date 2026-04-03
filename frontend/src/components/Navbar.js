@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+zßdhmimport { Link, useNavigate } from 'react-router-dom';
 import { TonConnectButton, useTonAddress, useTonConnectUI } from '@tonconnect/ui-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
@@ -39,23 +39,6 @@ const Navbar = () => {
             <Link to="/services" data-testid="nav-services-link">
               <Button variant="ghost" className="font-rajdhani text-white/80 hover:text-white">
                 Hotels
-              </Button>
-            </Link>
-            <Link to="/rewards" data-testid="nav-rewards-link">
-              <Button variant="ghost" className="font-rajdhani text-white/80 hover:text-white flex items-center gap-2">
-                <Gift className="h-4 w-4" />
-                Rewards
-              </Button>
-            </Link>
-
-            <Link to="/cart" className="relative" data-testid="nav-cart-link">
-              <Button variant="ghost" size="icon" className="relative">
-                <ShoppingCart className="h-5 w-5" />
-                {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-mono">
-                    {cartCount}
-                  </span>
-                )}
               </Button>
             </Link>
 
