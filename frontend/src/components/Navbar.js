@@ -22,7 +22,7 @@ const Navbar = () => {
 
   return (
     <nav className="sticky top-0 z-50 glass-panel border-b border-white/10">
-      <div className="container mx-auto px-4 py-4">
+      <div className="w-full px-3 sm:px-4 py-3">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2" data-testid="nav-home-link">
             <div className="text-xl sm:2xl md:text-3xl font-orbitron font-black text-primary glow-text-primary uppercase tracking-tighter">
