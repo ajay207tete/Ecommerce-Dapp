@@ -85,7 +85,9 @@ w-4" />
               </DropdownMenu>
             ) : (
               <Link to="/login" data-testid="nav-login-link">
-                <Button className="bg-primary hover:bg-primary/90 font-orbitron uppercase tracking-wider">
+                <Button 
+             size="sm"
+        className="px-3 py-1 text-xs sm:text-sm h-8 sm:h-9 bg-primary hover:bg-primary/90 font-orbitron uppercase tracking-wider">
                   Sign In
                 </Button>
               </Link>
