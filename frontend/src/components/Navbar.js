@@ -3,7 +3,7 @@ import { TonConnectButton, useTonAddress, useTonConnectUI } from '@tonconnect/ui
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { Button } from './ui/button';
-import { ShoppingCart, User, LogOut, LayoutDashboard, Gift, Wallet } from 'lucide-react';
+import { ShoppingCart, User, LogOut, LayoutDashboard, Gift, Wallet,Trophy} from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -61,7 +61,7 @@ const Navbar = () => {
 navigate('/cart')} data-testid="nav-cart">
                   <ShoppingCart className="mr-2 h-4 w-4" /> Cart ({cartCount})
                   </DropdownMenuItem>
-                  <DropdownMenuItem on click={()=>
+                  <DropdownMenuItem onClick={()=>
 navigate('/rewards')} data-testid="nav-rewards">
                    <Trophy className="mr-3 h-4
 w-4" />
