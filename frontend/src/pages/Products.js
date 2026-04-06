@@ -67,7 +67,7 @@ const Products = () => {
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {products.map((product) => (
+            {products?.map((product) => (
               <Card
                 key={product.id}
                 className="group relative overflow-hidden bg-[#0F0F1C] border-white/5 hover:border-secondary/50 transition-all duration-300 cursor-pointer"
