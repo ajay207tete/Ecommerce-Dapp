@@ -61,6 +61,12 @@ const Navbar = () => {
 navigate('/cart')} data-testid="nav-cart">
                   <ShoppingCart className="mr-2 h-4 w-4" /> Cart ({cartCount})
                   </DropdownMenuItem>
+                  <DropdownMenuItem on click={()=>
+navigate('/rewards')} data-testid="nav-rewards">
+                   <Trophy className="mr-3 h-4
+w-4" />
+                  My Rewards
+                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate('/nfts')} data-testid="nav-nfts">
                     <Gift className="mr-2 h-4 w-4" />
                     My NFTs
