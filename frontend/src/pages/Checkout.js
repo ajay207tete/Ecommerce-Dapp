@@ -278,133 +278,175 @@ const Checkout = () => {
         <div className="grid md:grid-cols-2 gap-8">
           <div>
             <Card className="bg-[#0F0F1C]/80 backdrop-blur-md border-white/10 p-6">
-              <h2 className="text-2xl font-orbitron text-white mb-6">Shipping Information</h2>
-              
+              <h2 className="text-2xl font-orbitron text-white mb-6">
+  {orderType === 'hotel' ? 'Booking Details' : 'Shipping Information'}
+</h2>
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <Label htmlFor="full_name" className="text-white/80">Full Name</Label>
-                  <Input
-                    id="full_name"
-                    name="full_name"
-                    value={shippingInfo.full_name}
-                    onChange={handleInputChange}
-                    required
-                    className="bg-input border-white/10 text-white"
-                    data-testid="checkout-full-name"
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="address" className="text-white/80">Address</Label>
-                  <Input
-                    id="address"
-                    name="address"
-                    value={shippingInfo.address}
-                    onChange={handleInputChange}
-                    required
-                    className="bg-input border-white/10 text-white"
-                    data-testid="checkout-address"
-                  />
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="city" className="text-white/80">City</Label>
-                    <Input
-                      id="city"
-                      name="city"
-                      value={shippingInfo.city}
-                      onChange={handleInputChange}
-                      required
-                      className="bg-input border-white/10 text-white"
-                      data-testid="checkout-city"
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="postal_code" className="text-white/80">Postal Code</Label>
-                    <Input
-                      id="postal_code"
-                      name="postal_code"
-                      value={shippingInfo.postal_code}
-                      onChange={handleInputChange}
-                      required
-                      className="bg-input border-white/10 text-white"
-                      data-testid="checkout-postal-code"
-                    />
-                  </div>
-                </div>
-                
-                <div>
-                  <Label htmlFor="country" className="text-white/80">Country</Label>
-                  <Input
-                    id="country"
-                    name="country"
-                    value={shippingInfo.country}
-                    onChange={handleInputChange}
-                    required
-                    className="bg-input border-white/10 text-white"
-                    data-testid="checkout-country"
-                  />
-                </div>
-                
-                <div>
-                  <Label htmlFor="phone" className="text-white/80">Phone (Optional)</Label>
-                  <Input
-                    id="phone"
-                    name="phone"
-                    value={shippingInfo.phone}
-                    onChange={handleInputChange}
-                    className="bg-input border-white/10 text-white"
-                    data-testid="checkout-phone"
-                  />
-                </div>
-                
-                <div className="pt-4">
-                  <Label className="text-white/80 mb-3 block">Payment Method</Label>
-                  
-                  {!walletAddress && (
-                    <div className="bg-yellow-500/10 border border-yellow-500/30 rounded p-3 mb-3">
-                      <p className="text-xs text-yellow-500 font-rajdhani">
-                        ⚠️ Connect your TON wallet to enable crypto payments
-                      </p>
-                    </div>
-                  )}
-                  
-                  <Select value={paymentMethod} onValueChange={setPaymentMethod}>
-                    <SelectTrigger className="bg-input border-white/10 text-white" data-testid="payment-method-select">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-[#0F0F1C] border-white/10">
-                      <SelectItem value="INR">Pay with INR (Cashfree)</SelectItem>
-                      <SelectItem value="ton" disabled={!walletAddress}>TON (via Connected Wallet)</SelectItem>
-                      <SelectItem value="btc" disabled={!walletAddress}>Bitcoin (BTC)</SelectItem>
-                      <SelectItem value="eth" disabled={!walletAddress}>Ethereum (ETH)</SelectItem>
-                      <SelectItem value="usdc" disabled={!walletAddress}>USDC</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <p className="text-xs text-white/40 mt-2 font-rajdhani">
-                    {paymentMethod === 'INR' 
-                      ? 'Secure payment via Cashfree - UPI, Cards, Net Banking' 
-                      : paymentMethod === 'ton'
-                      ? '✓ Pay directly from your connected TON wallet'
-                      : 'Crypto payment via NOWPayments'}
-                  </p>
-                </div>
-                
-                <Button
-                  type="submit"
-                  className="w-full bg-primary hover:bg-primary/90 font-orbitron uppercase tracking-wider py-6 mt-6"
-                  disabled={loading}
-                  data-testid="place-order-btn"
-                >
-                  {loading ? (
-                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing...</>
-                  ) : (
-                    'Place Order'
-                  )}
-                </Button>
-              </form>
+
+  {orderType === 'hotel' ? (
+    <>
+      {/* 🏨 HOTEL BOOKING FIELDS */}
+
+      <div>
+        <Label className="text-white/80">Guest Name</Label>
+        <Input
+          name="full_name"
+          value={shippingInfo.full_name}
+          onChange={handleInputChange}
+          required
+          className="bg-input border-white/10 text-white"
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label className="text-white/80">Check-in</Label>
+          <Input
+            type="date"
+            name="checkin"
+            onChange={handleInputChange}
+            required
+            className="bg-input border-white/10 text-white"
+          />
+        </div>
+
+        <div>
+          <Label className="text-white/80">Check-out</Label>
+          <Input
+            type="date"
+            name="checkout"
+            onChange={handleInputChange}
+            required
+            className="bg-input border-white/10 text-white"
+          />
+        </div>
+      </div>
+
+      <div>
+        <Label className="text-white/80">Guests</Label>
+        <Input
+          type="number"
+          name="guests"
+          min="1"
+          onChange={handleInputChange}
+          required
+          className="bg-input border-white/10 text-white"
+        />
+      </div>
+
+      <div>
+        <Label className="text-white/80">Phone</Label>
+        <Input
+          name="phone"
+          value={shippingInfo.phone}
+          onChange={handleInputChange}
+          className="bg-input border-white/10 text-white"
+        />
+      </div>
+    </>
+  ) : (
+    <>
+      {/* 🛒 PRODUCT SHIPPING FIELDS */}
+
+      <div>
+        <Label className="text-white/80">Full Name</Label>
+        <Input
+          name="full_name"
+          value={shippingInfo.full_name}
+          onChange={handleInputChange}
+          required
+          className="bg-input border-white/10 text-white"
+        />
+      </div>
+
+      <div>
+        <Label className="text-white/80">Address</Label>
+        <Input
+          name="address"
+          value={shippingInfo.address}
+          onChange={handleInputChange}
+          required
+          className="bg-input border-white/10 text-white"
+        />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label className="text-white/80">City</Label>
+          <Input
+            name="city"
+            value={shippingInfo.city}
+            onChange={handleInputChange}
+            required
+            className="bg-input border-white/10 text-white"
+          />
+        </div>
+
+        <div>
+          <Label className="text-white/80">Postal Code</Label>
+          <Input
+            name="postal_code"
+            value={shippingInfo.postal_code}
+            onChange={handleInputChange}
+            required
+            className="bg-input border-white/10 text-white"
+          />
+        </div>
+      </div>
+
+      <div>
+        <Label className="text-white/80">Country</Label>
+        <Input
+          name="country"
+          value={shippingInfo.country}
+          onChange={handleInputChange}
+          required
+          className="bg-input border-white/10 text-white"
+        />
+      </div>
+
+      <div>
+        <Label className="text-white/80">Phone</Label>
+        <Input
+          name="phone"
+          value={shippingInfo.phone}
+          onChange={handleInputChange}
+          className="bg-input border-white/10 text-white"
+        />
+      </div>
+    </>
+  )}
+
+  {/* 💳 PAYMENT SECTION (KEEP YOUR EXISTING CODE BELOW) */}
+
+  <div className="pt-4">
+    <Label className="text-white/80 mb-3 block">Payment Method</Label>
+
+    <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+      <SelectTrigger className="bg-input border-white/10 text-white">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent className="bg-[#0F0F1C] border-white/10">
+        <SelectItem value="INR">Pay with INR</SelectItem>
+        <SelectItem value="ton">TON</SelectItem>
+      </SelectContent>
+    </Select>
+  </div>
+
+  <Button
+    type="submit"
+    className="w-full bg-primary hover:bg-primary/90 py-6 mt-6"
+    disabled={loading}
+  >
+    {loading
+      ? 'Processing...'
+      : orderType === 'hotel'
+      ? 'Confirm Booking'
+      : 'Place Order'}
+  </Button>
+
+</form>
+             
             </Card>
           </div>
 
