@@ -456,7 +456,7 @@ const Checkout = () => {
               
               <div className="space-y-3 mb-6">
                 {existingOrder ? (
-                  existingOrder.items.map((item) => (
+                  existingOrder?.items?.map((item) => (
                     <div key={item.item_id} className="flex justify-between text-white/80 font-rajdhani">
                       <span>{item.name}</span>
                       <span className="font-mono">${(item.price * item.quantity).toFixed(2)}</span>
