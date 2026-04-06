@@ -52,9 +52,9 @@ const Home = () => {
                 </Button>
               </Link>
               
-              <Link to="/rewards" data-testid="hero-earn-rewards-btn">
+              <Link to="/services" data-testid="hero-earn-rewards-btn">
                 <Button variant="outline" className="border-secondary text-secondary hover:bg-secondary/10 font-mono uppercase tracking-widest px-8 py-6 text-lg">
-                  Earn Rewards
+                  Book Now
                 </Button>
               </Link>
             </div>
