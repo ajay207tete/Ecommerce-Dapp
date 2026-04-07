@@ -40,7 +40,7 @@ const Cart = () => {
                 <div className="flex-1">
                   <h3 className="text-xl font-orbitron text-white mb-1">{item.name}</h3>
                   <p className="text-sm text-white/60 font-mono">{item.item_type}</p>
-                  <p className="text-xl text-primary font-mono mt-2">${item.price.toFixed(2)}</p>
+                  <p className="text-xl text-primary font-mono mt-2">₹{item.price.toFixed(2)}</p>
                 </div>
 
                 <div className="flex items-center gap-3">
@@ -67,7 +67,7 @@ const Cart = () => {
 
                 <div className="text-right min-w-[100px]">
                   <p className="text-xl font-bold text-white font-mono">
-                    ${(item.price * item.quantity).toFixed(2)}
+                    ₹{(item.price * item.quantity).toFixed(2)}
                   </p>
                 </div>
 
@@ -89,7 +89,7 @@ const Cart = () => {
           <div className="flex items-center justify-between mb-6">
             <span className="text-2xl font-orbitron text-white">Total</span>
             <span className="text-3xl font-bold text-primary font-mono" data-testid="cart-total">
-              ${total.toFixed(2)}
+              ₹{total.toFixed(2)}
             </span>
           </div>
           
