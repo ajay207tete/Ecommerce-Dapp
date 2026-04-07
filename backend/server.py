@@ -63,6 +63,7 @@ class Product(BaseModel):
     images: List[str] = []
     stock: int = 0
     category: str = ""
+    sizes: List[str] = ["S", "M", "L", "XL"]
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
@@ -436,6 +437,7 @@ async def create_inr_payment(order_id: str, current_user: User = Depends(get_cur
             "user_id": current_user.id,
             "customer_email": current_user.email,
             "customer_phone": customer_phone
+             "return_url": "https://ecommerce-dapp-i9u9.vercel.app/payment-success?payment_id={order_id}"
         })
         
         # Store payment in database
