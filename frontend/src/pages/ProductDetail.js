@@ -197,7 +197,7 @@ const ProductDetail = () => {
               <div className="flex justify-between items-center mb-4 pt-4 border-t border-white/10">
                 <span className="text-white/60 font-rajdhani">Subtotal:</span>
                 <span className="text-2xl font-bold text-primary font-mono">
-                  ${(product.price * quantity).toFixed(2)}
+                  ₹{(product.price * quantity).toFixed(2)}
                 </span>
               </div>
 
