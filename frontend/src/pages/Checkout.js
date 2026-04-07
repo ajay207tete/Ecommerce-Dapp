@@ -298,42 +298,6 @@ const Checkout = () => {
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label className="text-white/80">Check-in</Label>
-          <Input
-            type="date"
-            name="checkin"
-            onChange={handleInputChange}
-            required
-            className="bg-input border-white/10 text-white"
-          />
-        </div>
-
-        <div>
-          <Label className="text-white/80">Check-out</Label>
-          <Input
-            type="date"
-            name="checkout"
-            onChange={handleInputChange}
-            required
-            className="bg-input border-white/10 text-white"
-          />
-        </div>
-      </div>
-
-      <div>
-        <Label className="text-white/80">Guests</Label>
-        <Input
-          type="number"
-          name="guests"
-          min="1"
-          onChange={handleInputChange}
-          required
-          className="bg-input border-white/10 text-white"
-        />
-      </div>
-
       <div>
         <Label className="text-white/80">Phone</Label>
         <Input
