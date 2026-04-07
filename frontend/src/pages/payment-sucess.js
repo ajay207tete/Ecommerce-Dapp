@@ -8,7 +8,10 @@ export default function PaymentSuccess() {
   const paymentId = new URLSearchParams(window.location.search).get("payment_id");
 
   useEffect(() => {
-    if (!paymentId) return;
+    if (!paymentId) {
+    setStatus("❌ Invalid payment link");
+    return;
+  }
 
     const checkPayment = async () => {
       try {
@@ -25,6 +28,9 @@ export default function PaymentSuccess() {
           });
 
           setStatus("✅ Payment Successful & Order Confirmed!");
+setTimeout(() => {
+    window.location.href = "/dashboard"; // or /orders
+  }, 3000);
         } else {
           setStatus("⏳ Waiting for confirmation...");
         }
