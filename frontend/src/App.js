@@ -17,6 +17,7 @@ import NFTGallery from './pages/NFTGallery';
 import AdminPanel from './pages/AdminPanel';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import PaymentSuccess from './pages/PaymentSuccess';
 import './App.css';
 
 // Use environment variable or deployed URL for manifest
@@ -71,6 +72,7 @@ function App() {
                 <Route path="/admin" element={<AdminPanel />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/payment-success" element={<PaymentSuccess />} />
               </Routes>
               <Toaster position="top-right" />
             </div>
