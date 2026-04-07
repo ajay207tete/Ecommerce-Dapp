@@ -146,7 +146,7 @@ const ProductDetail = () => {
 
             <div className="mb-6">
               <div className="text-4xl font-bold text-primary font-mono mb-2">
-                ${product.price.toFixed(2)}
+                ₹{product.price.toFixed(2)}
               </div>
               {product.stock > 0 ? (
                 <div className="text-secondary font-mono">
