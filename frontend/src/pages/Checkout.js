@@ -229,7 +229,7 @@ const Checkout = () => {
               
               <div>
                 <Label className="text-white/60">Amount</Label>
-                <p className="text-2xl font-bold text-primary font-mono">${paymentInfo.amount.toFixed(2)}</p>
+                <p className="text-2xl font-bold text-primary font-mono">₹{paymentInfo.amount.toFixed(2)}</p>
               </div>
               
               {paymentInfo.pay_address && (
@@ -466,7 +466,7 @@ const Checkout = () => {
                   cartItems.map((item) => (
                     <div key={item.item_id} className="flex justify-between text-white/80 font-rajdhani">
                       <span>{item.name} x {item.quantity}</span>
-                      <span className="font-mono">${(item.price * item.quantity).toFixed(2)}</span>
+                      <span className="font-mono">₹{(item.price * item.quantity).toFixed(2)}</span>
                     </div>
                   ))
                 )}
@@ -476,7 +476,7 @@ const Checkout = () => {
                 <div className="flex justify-between items-center">
                   <span className="text-xl font-orbitron text-white">Total</span>
                   <span className="text-3xl font-bold text-primary font-mono" data-testid="checkout-total">
-                    ${(existingOrder ? orderTotal : total).toFixed(2)}
+                    ₹{(existingOrder ? orderTotal : total).toFixed(2)}
                   </span>
                 </div>
               </div>
