@@ -120,7 +120,7 @@ return (
                 </div>  
                 <div className="text-right">  
                   <div className="text-2xl font-bold text-primary font-mono">  
-                    ${order.total.toFixed(2)}  
+                    ₹{order.total.toFixed(2)}  
                   </div>  
                   <p className="text-xs text-white/40 font-mono mt-1">  
                     {new Date(order.created_at).toLocaleDateString()}  
