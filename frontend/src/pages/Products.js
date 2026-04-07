@@ -99,7 +99,7 @@ const Products = () => {
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="text-2xl font-bold text-primary font-mono">
-                        ${product.price.toFixed(2)}
+                        ₹{product.price.toFixed(2)}
                       </div>
                       {product.stock > 0 ? (
                         <div className="text-xs text-secondary font-mono">
