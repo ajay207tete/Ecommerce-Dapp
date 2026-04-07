@@ -248,7 +248,7 @@ const HotelDetail = () => {
             <Card className="bg-[#0F0F1C]/80 backdrop-blur-md border-white/10 p-6">
               <div className="mb-6">
                 <div className="text-3xl font-bold text-primary font-mono mb-1">
-                  ${hotel.price_per_night.toFixed(2)}
+                  ₹{hotel.price_per_night.toFixed(2)}
                 </div>
                 <div className="text-sm text-white/40">per night</div>
               </div>
