@@ -122,7 +122,7 @@ const Services = () => {
                   <div className="flex items-center justify-between pt-4 border-t border-white/10">
                     <div>
                       <div className="text-2xl font-bold text-primary font-mono">
-                        ${hotel.price_per_night.toFixed(2)}
+                        ₹{hotel.price_per_night.toFixed(2)}
                       </div>
                       <div className="text-xs text-white/40 font-mono">per night</div>
                       {hotel.available_rooms && (
