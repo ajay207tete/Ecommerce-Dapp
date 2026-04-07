@@ -436,7 +436,7 @@ async def create_inr_payment(order_id: str, current_user: User = Depends(get_cur
             "amount": order['total'],
             "user_id": current_user.id,
             "customer_email": current_user.email,
-            "customer_phone": customer_phone
+            "customer_phone": customer_phone,
              "return_url": "https://ecommerce-dapp-i9u9.vercel.app/payment-success?payment_id={order_id}"
         })
         
