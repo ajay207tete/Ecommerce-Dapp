@@ -5,9 +5,16 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export default function PaymentSuccess() {
   const [status, setStatus] = useState("Checking payment...");
-  const paymentId = new URLSearchParams(window.location.search).get("payment_id");
+  const params = new URLSearchParams(window.location.search);
+
+const paymentId =
+  params.get("payment_id") ||   // NOWPayments
+  params.get("paymentId") ||    // fallback
+  params.get("order_id");       // Cashfree
 
   useEffect(() => {
+  if (paymentId === null) return; // wait
+
     if (!paymentId) {
     setStatus("❌ Invalid payment link");
     return;
@@ -15,7 +22,9 @@ export default function PaymentSuccess() {
 
     const checkPayment = async () => {
       try {
-        const res = await axios.get(`${API}/payments/${paymentId}/status`);
+        const res = await axios.get(`${API}/payments/status`, {
+  params: { id: paymentId }
+});
         
         if (res.data.status === "finished" || res.data.status === "completed") {
           
