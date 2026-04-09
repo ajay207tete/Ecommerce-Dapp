@@ -744,34 +744,67 @@ async def get_tasks(current_user: User = Depends(get_current_user)):
     return tasks
 
 
+
 @api_router.post("/tasks/complete")
 async def complete_task(task_id: str, current_user: User = Depends(get_current_user)):
-    task = await db.social_tasks.find_one({"id": task_id, "user_id": current_user.id}, {"_id": 0})
+
+    TASK_CONFIG = {
+        "telegram": {"reward": 10, "url": "https://t.me/thrustercommunity"},
+        "instagram": {"reward": 10, "url": "https://instagram.com"},
+        "youtube": {"reward": 15, "url": "https://youtube.com"}
+    }
+
+    if task_id not in TASK_CONFIG:
+        raise HTTPException(status_code=400, detail="Invalid task")
+
+    # 🔍 Find existing task
+    task = await db.social_tasks.find_one({
+        "user_id": current_user.id,
+        "task_type": task_id
+    })
+
+    # 🆕 CREATE if not exists (THIS IS THE FIX 🔥)
     if not task:
-        raise HTTPException(status_code=404, detail="Task not found")
-    
-    if task['status'] == 'completed':
+        task = {
+            "id": str(uuid.uuid4()),
+            "user_id": current_user.id,
+            "task_type": task_id,
+            "task_url": TASK_CONFIG[task_id]["url"],
+            "reward_amount": TASK_CONFIG[task_id]["reward"],
+            "status": "pending",
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.social_tasks.insert_one(task)
+
+    # ❌ already completed
+    if task["status"] == "completed":
         raise HTTPException(status_code=400, detail="Task already completed")
-    
+
+    # ✅ mark completed
     await db.social_tasks.update_one(
-        {"id": task_id},
-        {"$set": {"status": "completed", "completed_at": datetime.now(timezone.utc).isoformat()}}
+        {"id": task["id"]},
+        {
+            "$set": {
+                "status": "completed",
+                "completed_at": datetime.now(timezone.utc).isoformat()
+            }
+        }
     )
-    
+
+    # 🎁 add reward
     reward = Reward(
         user_id=current_user.id,
         reward_type="social_task",
-        amount=task['reward_amount'],
-        description=f"Completed task: {task['task_type']}",
+        amount=task["reward_amount"],
+        description=f"Completed task: {task_id}",
         status="completed"
     )
-    
+
     reward_doc = reward.model_dump()
     reward_doc['earned_at'] = reward_doc['earned_at'].isoformat()
     await db.rewards.insert_one(reward_doc)
-    
-    return {"message": "Task completed", "reward": reward}
 
+    return {"message": "Task completed", "reward": reward}
 
 @api_router.get("/admin/stats")
 async def get_admin_stats(current_user: User = Depends(get_current_user)):
