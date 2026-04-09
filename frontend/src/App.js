@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { TonConnectUIProvider } from '@tonconnect/ui-react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
 import { Toaster } from './components/ui/sonner';
@@ -80,6 +81,7 @@ function App() {
           </BrowserRouter>
         </CartProvider>
       </AuthProvider>
+      <SpeedInsights />
     </TonConnectUIProvider>
   );
 }
