@@ -343,7 +343,7 @@ const HotelDetail = () => {
                   </div>
                   <div className="flex justify-between text-xl font-bold text-primary font-mono pt-2 border-t border-white/10">
                     <span>Total:</span>
-                    <span>${calculateTotal().toFixed(2)}</span>
+                    <span>₹{calculateTotal().toFixed(2)}</span>
                   </div>
                 </div>
               )}
