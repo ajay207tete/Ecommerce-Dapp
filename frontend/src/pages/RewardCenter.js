@@ -77,7 +77,7 @@ const RewardCenter = () => {
   };
 
   const isTaskCompleted = (taskId) => {
-    return tasks.some(t => t.task_type === taskType && t.status === 'completed');
+    return tasks.some(t => t.task_type === taskId && t.status === 'completed');
   };
 
   if (loading) {
