@@ -3,6 +3,7 @@ import { TonConnectUIProvider } from '@tonconnect/ui-react';
 import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
 import { Toaster } from './components/ui/sonner';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Products from './pages/Products';
@@ -78,6 +79,7 @@ function App() {
             </div>
            </div>
           </BrowserRouter>
+          <SpeedInsights />
         </CartProvider>
       </AuthProvider>
     </TonConnectUIProvider>
