@@ -99,7 +99,10 @@ return (
         </Card>  
       ) : (  
         <div className="space-y-4">  
-          {orders.slice(0, 10).map((order) => (  
+          {[...orders]
+  .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+  .slice(0, 10)
+  .map((order) => (
             <Card  
               key={order.id}  
               className="bg-[#0F0F1C]/80 backdrop-blur-md border-white/10 p-6"  
