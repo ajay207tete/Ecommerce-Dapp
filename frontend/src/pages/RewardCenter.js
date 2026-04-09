@@ -64,7 +64,7 @@ const RewardCenter = () => {
     
     try {
       await axios.post(
-        `${API}/tasks/complete?task_id=${task.id}`,
+        `${API}/tasks/complete?task_id=${task.type}`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -77,7 +77,7 @@ const RewardCenter = () => {
   };
 
   const isTaskCompleted = (taskId) => {
-    return tasks.some(t => t.task_type === taskId && t.status === 'completed');
+    return tasks.some(t => t.task_type === taskType && t.status === 'completed');
   };
 
   if (loading) {
