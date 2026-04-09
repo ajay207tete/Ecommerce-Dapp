@@ -12,6 +12,7 @@ const { user, token } = useAuth();
 const [orders, setOrders] = useState([]);
 const [loading, setLoading] = useState(true);
 const navigate = useNavigate();
+const [hoveredOrder, setHoveredOrder] = useState(null);
 
 useEffect(() => {
 if (!user || !token) {
@@ -103,34 +104,71 @@ return (
   .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
   .slice(0, 10)
   .map((order) => (
-            <Card  
-              key={order.id}  
-              className="bg-[#0F0F1C]/80 backdrop-blur-md border-white/10 p-6"  
-              data-testid={`order-${order.id}`}  
-            >  
-              <div className="flex items-center justify-between">  
-                <div className="flex-1">  
-                  <div className="flex items-center gap-3 mb-2">  
-                    <span className="text-sm font-mono text-white/60">Order #{order.id.slice(0, 8)}</span>  
-                    <div className="flex items-center gap-2">  
-                      {getStatusIcon(order.status)}  
-                      <span className="text-sm font-mono text-white capitalize">{order.status}</span>  
-                    </div>  
-                  </div>  
-                  <p className="text-white/60 font-rajdhani text-sm">  
-                    {order.items.length} item(s)  
-                  </p>  
-                </div>  
-                <div className="text-right">  
-                  <div className="text-2xl font-bold text-primary font-mono">  
-                    ₹{order.total.toFixed(2)}  
-                  </div>  
-                  <p className="text-xs text-white/40 font-mono mt-1">  
-                    {new Date(order.created_at).toLocaleDateString()}  
-                  </p>  
-                </div>  
-              </div>  
-            </Card>  
+              <Card
+  key={order.id}
+  onMouseEnter={() => setHoveredOrder(order.id)}
+  onMouseLeave={() => setHoveredOrder(null)}
+  className="relative bg-[#0F0F1C]/80 backdrop-blur-md border-white/10 p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
+>
+  
+  {/* 🔹 Main Order Row */}
+  <div className="flex items-center justify-between">
+    <div className="flex-1">
+      <div className="flex items-center gap-3 mb-2">
+        <span className="text-sm font-mono text-white/60">
+          Order #{order.id.slice(0, 8)}
+        </span>
+        <div className="flex items-center gap-2">
+          {getStatusIcon(order.status)}
+          <span className="text-sm font-mono text-white capitalize">
+            {order.status}
+          </span>
+        </div>
+      </div>
+
+      <p className="text-white/60 font-rajdhani text-sm">
+        {order.items.length} item(s)
+      </p>
+    </div>
+
+    <div className="text-right">
+      <div className="text-2xl font-bold text-primary font-mono">
+        ₹{order.total.toFixed(2)}
+      </div>
+      <p className="text-xs text-white/40 font-mono mt-1">
+        {new Date(order.created_at).toLocaleDateString()}
+      </p>
+    </div>
+  </div>
+
+  {/* 🔥 HOVER DETAILS (PASTE HERE) */}
+  {hoveredOrder === order.id && (
+    <div className="mt-4 p-4 rounded-xl bg-black/40 border border-white/10 animate-fade-in">
+
+      <div>
+        <p className="text-sm text-white/60 mb-2">Items:</p>
+        {order.items.map((item, index) => (
+          <div key={index} className="flex justify-between text-sm text-white">
+            <span>{item.name}</span>
+            <span>x{item.quantity}</span>
+          </div>
+        ))}
+      </div>
+
+      {order.hotel && (
+        <div className="mt-3 pt-3 border-t border-white/10">
+          <p className="text-sm text-white/60 mb-1">Hotel:</p>
+          <p className="text-sm text-white">{order.hotel.name}</p>
+          <p className="text-xs text-white/50">
+            {order.hotel.check_in} → {order.hotel.check_out}
+          </p>
+        </div>
+      )}
+
+    </div>
+  )}
+
+</Card>
           ))}  
         </div>  
       )}  
