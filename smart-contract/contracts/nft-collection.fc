@@ -1,0 +1,91 @@
+#include "stdlib.fc";
+
+slice owner_address;
+int mintable;
+uint64 next_item_index;
+cell nft_item_code;
+cell content;  ;; offchain metadata Cell
+
+;; Initializer - called on deploy
+() init(slice cs) impure {
+  owner_address = cs~load_address();
+  mintable = 1;
+  next_item_index = 0;
+  nft_item_code = cs~load_ref();
+  content = cs~load_ref();
+}
+
+;; Receive internal messages
+() recv_internal(int balance, int msg_type, cell in_msg_full, slice in_msg_body) impure {
+  if (msg_type == 1) {
+    ;; Internal message with no body - deployment or top-up
+    return ();
+  } else {
+    ;; Internal message with body
+    uint32 op = in_msg_body~load_uint(32);
+    if (op == 1) {
+      ;; Mint operation
+      if (mintable == 0) { throw(401); }
+      address send_gas_to = in_msg_body~load_address();
+      cell nft_item_content = in_msg_body~load_ref();
+      mint_item(send_gas_to, nft_item_content);
+    } else {
+      ;; Unknown op
+      throw(402);
+    }
+  }
+}
+
+mint_item(address send_gas_to, cell nft_item_content) impure method {
+  ;; Verify sender is owner
+  address sender = my_balance() > 5000000000 ? get_msg_sender_address() : null_address;
+  if (!sender.equalslice(owner_address)) { throw(403); }
+  
+  ;; Create NFT item state init
+  cell state_init = calculate_item_state_init(next_item_index, nft_item_content);
+  address nft_item_address = contract_address(0, state_init);
+  
+  ;; Send deploy transaction to NFT item
+  slice deploy_body = begin_cell()
+    .store_uint(0, 32) ;; no op for deploy
+    .store_coins(50000000) ;; 0.05 TON deploy fee
+    .store_uint(1, 1) ;; mode 1 (pay fees separate)
+  .end_cell();
+  
+  send_raw_message(nft_item_address, 1888888888, deploy_body); ;; ~0.2 TON
+  
+  ;; Notify NFT item about ownership
+  slice notify_body = begin_cell()
+    .store_uint(0x7362d09c, 32) ;; NftOwnershipAssigned
+    .store_address(owner_address)
+  .end_cell();
+  send_raw_message(nft_item_address, 10000000, notify_body); ;; 0.01 TON notify
+  
+  ;; Update next index
+  next_item_index += 1;
+}
+
+calculate_item_state_init(uint64 id, cell item_content) impure method cell {
+  slice cs = begin_cell()
+    .store_dict(null) ;; no data
+    .store_ref(item_content) ;; nft content
+    .store_uint(id, 64) ;; id
+    .store_address(my_address()) ;; collection address
+  .end_cell().begin_parse();
+  
+  cell code = nft_item_code;
+  return bag_of_cells(code, cs);
+}
+
+;; Get methods (pure)
+( slice, uint64, cell ) get_collection_data() method_id {
+  return (owner_address, next_item_index, content);
+}
+
+uint64 get_next_item_index() method_id pure {
+  return next_item_index;
+}
+
+int get_mintable() method_id pure {
+  return mintable;
+}
