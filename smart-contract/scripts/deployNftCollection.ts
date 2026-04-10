@@ -1,42 +1,50 @@
 #!/usr/bin/env node
 import { getTonClient, getSender } from '../utils/helpers';
-import { TonClient4, compileFunc } from '@ton/ton';
+import { TonClient4 } from '@ton/ton';
 import { Cell, toNano, beginCell, Address } from '@ton/core';
-import { NftCollection } from '../wrappers/NftCollection';
+import { NftCollection, NftCollectionConfig } from '../wrappers/NftCollection';
 
 async function main() {
-  const metadataUrl = process.argv[2] || 'https://ipfs.io/ipfs/bafybeigdyrzt5sfp7udm7hu76uh7li5i64wnfr5bbr6_igfdsvd6j6nku/collection.json';
+  const collMetadataUrl = process.argv[2] || 'https://ipfs.io/ipfs/bafybeigdyrzt5sfp7udm7hu76uh7li5i64wnfr5bbr6_igfdsvd6j6nku/collection.json';
+  const staticMetadataUrl = process.argv[3] || 'https://ipfs.io/ipfs/bafybeifirsttimeloyalty-nft.json'; // First-time loyalty NFT
   
   const client = await getTonClient();
   const { wallet, sender } = await getSender();
   
-  // Compile contracts
-  const nftItemCode = await compileFunc({ code: 'nft-item' }); // Blueprint convention
-  const nftCollectionCode = await compileFunc({ code: 'nft-collection' });
+  // TODO: Replace with actual compiled codes
+  const nftItemCode = Cell.fromBase64('NFT_ITEM_CODE_BASE64_PLACEHOLDER');
+  const nftCollectionCode = Cell.fromBase64('NFT_COLLECTION_CODE_BASE64_PLACEHOLDER');
   
-  // Config
-  const collectionConfig = {
+  const collContent = beginCell()
+    .storeUint(0, 8)
+    .storeStringTail(collMetadataUrl)
+    .endCell();
+  
+  const staticContent = beginCell()
+    .storeUint(0, 8)
+    .storeStringTail(staticMetadataUrl)
+    .endCell();
+  
+  const collectionConfig: NftCollectionConfig = {
     owner: wallet.address,
     nft_item_code: nftItemCode,
-    content: beginCell()
-      .storeUint(0, 8)
-      .storeStringTail(metadataUrl)
-      .endCell()
+    coll_content: collContent,
+    static_content: staticContent
   };
   
-  // Get address
   const collectionAddress = NftCollection.getAddress(collectionConfig, nftCollectionCode, 0);
   console.log('Collection address:', collectionAddress.toString());
   
-  // Deploy
   const collection = client.open(NftCollection.createFromAddress(collectionAddress));
   
-  await collection.sendDeploy(sender, toNano('0.3'), metadataUrl);
+  await collection.sendDeploy(client.provider, sender, toNano('0.3'));
   
   console.log('NFT Collection deployed!');
   console.log('Address:', collectionAddress.toString());
   console.log('Owner:', wallet.address.toString());
-  console.log('Fund it with testnet TON if needed.');
+  console.log('Static content:', staticMetadataUrl);
+  console.log('\\nCompile FunC first, then deploy!');
 }
 
 main().catch(console.error);
+

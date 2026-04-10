@@ -5,17 +5,22 @@ import {
   Contract, 
   ContractProvider, 
   Sender, 
-  Slice 
+  Slice,
+  contractAddress 
 } from '@ton/core';
 
-export type NftMintArgs = {
+export type NftMintDynamicArgs = {
   toAddress: Address;
   nftItemContent: Cell;
 };
 
+export type NftMintStaticArgs = {
+  toAddress: Address;
+};
+
 export class NftCollection implements Contract {
   constructor(readonly address: Address) {}
-
+ 
   static createFromAddress(address: Address) {
     return new NftCollection(address);
   }
@@ -23,70 +28,85 @@ export class NftCollection implements Contract {
   static createFromConfig(config: NftCollectionConfig, code: Cell, workchain = 0) {
     const data = packNftCollectionData(config);
     const init = { code, data };
-    return new NftCollection(Address.fromCellStateInit(workchain, init));
+    return new NftCollection(contractAddress(workchain, init));
   }
 
   static getAddress(config: NftCollectionConfig, code: Cell, workchain = 0) {
     const data = packNftCollectionData(config);
     const init = { code, data };
-    return Address.fromCellStateInit(workchain, init);
+    return contractAddress(workchain, init);
   }
 
-  async sendDeploy(provider: ContractProvider, via: Sender, value: bigint) {
-    await provider.internal(via, {
-      value,
-      body: beginCell(),
-      deploy: true
-    });
-  }
+  async sendDeploy(provider: ContractProvider, via: Sender, value?: bigint) {\n    await provider.internal(via, {\n      value: value || 250000000n,\n      body: beginCell(),\n      deploy: true\n    });\n  }
 
-  async sendMint(provider: ContractProvider, via: Sender, args: NftMintArgs, value = 250000000n ) {
+  async sendMintDynamic(provider: ContractProvider, via: Sender, args: NftMintDynamicArgs, value = 250000000n ) {
     await provider.internal(via, {
       value,
       body: beginCell()
-        .storeUint(1, 32) // mint op
+        .storeUint(1, 32) // OP_MINT
         .storeAddress(args.toAddress)
         .storeRef(args.nftItemContent)
         .endCell()
     });
   }
 
+  async sendMintStatic(provider: ContractProvider, via: Sender, args: NftMintStaticArgs, value = 250000000n ) {
+    await provider.internal(via, {
+      value,
+      body: beginCell()
+        .storeUint(3, 32) // OP_MINT_STATIC
+        .storeAddress(args.toAddress)
+        .endCell()
+    });
+  }
+
   async getCollectionData(provider: ContractProvider): Promise<NftCollectionData> {
-    const res = provider.get('get_collection_data', []) as Cell;
-    return unpackNftCollectionData(res.beginParse());
+    const boc = await provider.get('get_collection_data', []);
+    const cell = Cell.fromBoc(Buffer.from(boc as any))[0];
+    return unpackNftCollectionData(cell.beginParse());
   }
 
   async getNextSerialNumber(provider: ContractProvider): Promise<bigint> {
-    const res = provider.get('get_next_item_index', []) as bigint;
-    return res;
+    const data = await this.getCollectionData(provider);
+    return data.nextItemIndex;
   }
 }
 
 export interface NftCollectionConfig {
   owner: Address;
   nft_item_code: Cell;
-  content: Cell;
+  coll_content: Cell;
+  static_content: Cell;
 }
 
-function packNftCollectionData(src: NftCollectionConfig): Cell {
+export function packNftCollectionData(config: NftCollectionConfig): Cell {
   return beginCell()
-    .storeAddress(src.owner)
-    .storeRef(src.nft_item_code)
-    .storeRef(src.content)
+    .storeAddress(config.owner)
+    .storeBit(1) // mintable
+    .storeUint(0, 64) // next_item_index
+    .storeRef(config.nft_item_code)
+    .storeRef(config.coll_content)
+    .storeRef(config.static_content)
     .endCell();
 }
 
-function unpackNftCollectionData(slice: Slice): NftCollectionData {
+export function unpackNftCollectionData(slice: Slice): NftCollectionData {
   return {
+    mintable: slice.loadInt(1),
     owner: slice.loadAddress(),
-    nextItemIndex: slice.loadBigUint(64),
-    content: slice.loadRef(),
+    nextItemIndex: slice.loadUintBig(64),
+    nft_item_code: slice.loadRef(),
+    coll_content: slice.loadRef(),
+    static_content: slice.loadRef()
   };
 }
 
 export interface NftCollectionData {
+  mintable: number;
   owner: Address;
   nextItemIndex: bigint;
-  content: Cell;
+  nft_item_code: Cell;
+  coll_content: Cell;
+  static_content: Cell;
 }
 

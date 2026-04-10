@@ -1,76 +1,61 @@
-#include "/node_modules/@ton/blueprint-contracts/wrappers/FunC/stdlib.fc";
-
-() import "@stdlib";
+#include "stdlib.fc";
 
 slice owner;
-slice collection_address;
-uint64 index;
-cell individual_content;
+slice collection;
+uint64 id;
+cell content;
 
-() init(slice in_stream) impure {
-  individual_content = in_stream~load_ref();
-  index = in_stream~load_uint(64);
-  collection_address = in_stream~load_msg_addr();
-  owner = in_stream~load_address();
+() init(slice cs) impure {
+  ;; init nft item from collection deploy
+  ;; data: dict, content, id, collection
+  cs~load_dict();
+  content = cs~load_ref();
+  id = cs~load_uint(64);
+  collection = cs~load_address();
+  owner = cs~load_address();
 }
 
-() recv_internal(int balance, int msg_type, cell in_msg_full, slice in_msg_body) impure {
-  slice sender = in_msg_full.begin_parse().load_msg_addr();
-  uint32 op = in_msg_body~load_uint(32);
-  
+() recv_internal(int my_balance, int msg_type, cell in_msg, slice msg_body) impure {
+  if (msg_type != 3) { return (); }
+
+  slice cs = msg_body;
+  int op = cs~load_uint(32);
+
   if (op == 0x5fcc3d14) { ;; transfer
-    address to_address = in_msg_body~load_address();
-    cell response_dest = in_msg_body~load_ref();
-    uint128 query_id = in_msg_body~load_uint(64);
-    cell nft_payload = in_msg_body~load_ref();
-    transfer(to_address, response_dest, query_id, nft_payload, sender);
-  } else if (op == 0x595f07bc) { ;; get nft data
-    send_raw_message(get_msg_sender_address(), 64000000, begin_cell().store_uint(0x2a0a5abd, 32)
-      .store_address(owner)
-      .store_address(collection_address)
-      .store_uint(index, 64)
-      .store_ref(individual_content)
+    slice new_owner = cs~load_address();
+    cell notification = cs~load_ref();
+    int query_id = cs~load_uint(64);
+    
+    ;; update owner
+    set_data(begin_cell()
+      .store_dict(null)
+      .store_ref(content)
+      .store_uint(id, 64)
+      .store_slice(collection)
+      .store_slice(new_owner)
       .end_cell());
-  } else if (op == 0x7362d09c) { ;; ownership assigned
-    ;; from collection, set owner
-    owner = get_msg_sender_address(); ;; no, from body
-    ;; ignore for simple
-  } else {
-    ;; unknown
+    
+    ;; notify callback
+    if (notification.as_slice().bits() > 0) {
+      slice notify = begin_cell()
+        .store_slice(notification.as_slice())
+        .store_uint(query_id, 64)
+        .store_uint(1, 1) ;; ok
+        .end_cell().as_slice();
+      send_raw_message(get_sender_address(), 64_000_000, 1, notify);
+    }
+  } else if (op == 0x7362d09c) { ;; NftOwnershipAssigned
+    ;; set owner from collection
+    owner = cs~load_address();
   }
-}
-
-transfer(address to_address, cell response_dest, uint128 query_id, cell custom_payload, slice notify_addr) impure {
-  ;; check custom_payload
-  slice custom_cs = custom_payload.begin_parse();
-  if (custom_cs.slice_bits() > 0) { throw(0x20); }
-  
-  ;; deploy if needed
-  if (contract_balance(to_address) == 0) {
-    send_raw_message(to_address, 100000000, 1); ;; deploy
-  }
-  
-  ;; update owner
-  owner = to_address.slice();
-  
-  ;; notify
-  if (response_dest != null) {
-    slice notify = begin_cell()
-      .store_slice(response_dest.begin_parse())
-      .store_uint(query_id, 64)
-      .store_uint(1, 1) ;; success
-      .end_cell();
-    send_raw_message(notify_addr, 64000000, notify);
-  }
-  
-  ;; notify new owner
-  slice new_owner_notify = begin_cell()
-    .store_uint(0x7362d09c, 32)
-    .store_address(to_address)
-    .end_cell();
-  send_raw_message(to_address, 64000000, new_owner_notify);
 }
 
 () get_nft_data() method_id pure {
-  return (owner, collection_address, index, individual_content);
+  slice d = get_data().as_slice();
+  d~load_dict();
+  cell cont = d~load_ref();
+  uint64 item_id = d~load_uint(64);
+  slice col = d~load_address();
+  slice own = d~load_address();
+  return (own, col, item_id, cont);
 }
