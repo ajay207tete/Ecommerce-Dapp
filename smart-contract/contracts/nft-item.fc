@@ -1,31 +1,33 @@
 #include "stdlib.fc";
 
-slice owner;
-slice collection;
-uint64 id;
-cell content;
-
 () init(slice cs) impure {
-  ;; init nft item from collection deploy
-  ;; data: dict, content, id, collection
-  cs~load_dict();
-  content = cs~load_ref();
-  id = cs~load_uint(64);
-  collection = cs~load_address();
-  owner = cs~load_address();
+  ;; dict | content | id | collection | owner
+  set_data(cs);
 }
 
-() recv_internal(int my_balance, int msg_type, cell in_msg, slice msg_body) impure {
-  if (msg_type != 3) { return (); }
+() recv_internal(int balance, int msg_type, cell in_msg, slice msg_body) impure {
+  if (msg_type != 0) { return (); }
 
   slice cs = msg_body;
   int op = cs~load_uint(32);
 
-  if (op == 0x5fcc3d14) { ;; transfer
+  ;; -------- TRANSFER --------
+  if (op == 0x5fcc3d14) {
     slice new_owner = cs~load_address();
-    cell notification = cs~load_ref();
-    int query_id = cs~load_uint(64);
-    
+
+    slice ds = get_data().begin_parse();
+
+    ds~load_dict();
+    cell content = ds~load_ref();
+    uint64 id = ds~load_uint(64);
+    slice collection = ds~load_address();
+    slice owner = ds~load_address();
+
+    ;; only owner can transfer
+    if (get_sender_address() != owner) {
+      throw(401);
+    }
+
     ;; update owner
     set_data(begin_cell()
       .store_dict(null)
@@ -34,28 +36,18 @@ cell content;
       .store_slice(collection)
       .store_slice(new_owner)
       .end_cell());
-    
-    ;; notify callback
-    if (notification.as_slice().bits() > 0) {
-      slice notify = begin_cell()
-        .store_slice(notification.as_slice())
-        .store_uint(query_id, 64)
-        .store_uint(1, 1) ;; ok
-        .end_cell().as_slice();
-      send_raw_message(get_sender_address(), 64_000_000, 1, notify);
-    }
-  } else if (op == 0x7362d09c) { ;; NftOwnershipAssigned
-    ;; set owner from collection
-    owner = cs~load_address();
   }
 }
 
-() get_nft_data() method_id pure {
-  slice d = get_data().as_slice();
-  d~load_dict();
-  cell cont = d~load_ref();
-  uint64 item_id = d~load_uint(64);
-  slice col = d~load_address();
-  slice own = d~load_address();
-  return (own, col, item_id, cont);
+;; ===== GETTER =====
+(slice, slice, uint64, cell) get_nft_data() method_id {
+  slice ds = get_data().begin_parse();
+
+  ds~load_dict();
+  cell content = ds~load_ref();
+  uint64 id = ds~load_uint(64);
+  slice collection = ds~load_address();
+  slice owner = ds~load_address();
+
+  return (owner, collection, id, content);
 }
