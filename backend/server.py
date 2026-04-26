@@ -835,6 +835,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
     allow_origins=["https://ecommerce-dapp-i9u9.vercel.app",
+"https://www.thruster.in",
 "http://localhost:3000",
     "http://localhost:19006"],
     allow_methods=["*"],
