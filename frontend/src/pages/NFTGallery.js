@@ -43,7 +43,7 @@ const NFTGallery = () => {
   }
 
   return (
-    <div className="min-h-screen py-12 px-4" data-testid="nft-gallery-page">
+   <div className="min-h-screen pt-24 md:pt-32 pb-12 px-4" data-testid="nft-gallery-page">
       <div className="container mx-auto">
         <div className="mb-12">
           <h1 className="text-5xl font-bold font-orbitron uppercase mb-4 text-white">My NFTs</h1>
