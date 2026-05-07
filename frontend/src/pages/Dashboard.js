@@ -53,7 +53,8 @@ return (
 }
 
 return (
-<div className="min-h-screen pt-24 md:pt-32 pb-12 px-4 data-testid="dashboard-page">
+<div className="min-h-screen pt-24 md:pt-32 pb-12 px-4" data-testid=
+"dashboard-page">
 <div className="container mx-auto">
 <div className="mb-12">
 <h1 className="text-5xl font-bold font-orbitron uppercase mb-2 text-white">Dashboard</h1>
