@@ -9,7 +9,7 @@ const Cart = () => {
 
   if (cartItems.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4" data-testid="cart-page">
+    <div className="min-h-screen pt-24 md:pt-32 pb-12 px-4" data-testid="cart-page">
         <div className="text-center">
           <ShoppingBag className="h-24 w-24 mx-auto mb-6 text-white/20" />
           <h2 className="text-3xl font-orbitron text-white mb-4">Your cart is empty</h2>
