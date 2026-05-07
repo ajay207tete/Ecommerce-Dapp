@@ -25,7 +25,7 @@ const Cart = () => {
   }
 
   return (
-    <div className="min-h-screen py-12 px-4" data-testid="cart-page">
+    <div className="min-h-screen pt-24 md:pt-32 pb-12 px-4" data-testid="cart-page">
       <div className="container mx-auto max-w-4xl">
         <h1 className="text-5xl font-bold font-orbitron uppercase mb-8 text-white">Shopping Cart</h1>
 
