@@ -75,7 +75,7 @@ const ProductDetail = () => {
   }
 
   return (
-    <div className="min-h-screen py-12 px-4" data-testid="product-detail-page">
+   <div className="min-h-screen pt-24 md:pt-32 pb-12 px-4" data-testid="product-detail-page">
       <div className="container mx-auto max-w-6xl">
         <Button
           variant="ghost"
