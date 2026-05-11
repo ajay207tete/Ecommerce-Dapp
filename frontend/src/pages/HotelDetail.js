@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+
 import { useAuth } from '../contexts/AuthContext';
 
 import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 import { Calendar } from '../components/ui/calendar';
+
 import {
   Popover,
   PopoverContent,
@@ -20,8 +22,7 @@ import {
   Users,
   Loader2,
   ChevronLeft,
-  ChevronRight,
-  Search
+  ChevronRight
 } from 'lucide-react';
 
 import { format } from 'date-fns';
@@ -32,28 +33,29 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const HotelDetail = () => {
   const { id } = useParams();
+
   const { user, token } = useAuth();
+
   const navigate = useNavigate();
 
   const [hotel, setHotel] = useState(null);
   const [loading, setLoading] = useState(true);
+
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const [checkIn, setCheckIn] = useState(null);
   const [checkOut, setCheckOut] = useState(null);
+
   const [guests, setGuests] = useState(1);
+
   const [bookingLoading, setBookingLoading] = useState(false);
 
-  // Search
-  const [searchQuery, setSearchQuery] = useState('');
-
-  // User Location
   const [userLocation, setUserLocation] = useState(null);
 
   useEffect(() => {
     fetchHotel();
 
-    // Auto Detect User Location
+    // Auto detect location
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -63,7 +65,7 @@ const HotelDetail = () => {
           });
         },
         (error) => {
-          console.error('Location access denied:', error);
+          console.error(error);
         }
       );
     }
@@ -72,10 +74,12 @@ const HotelDetail = () => {
   const fetchHotel = async () => {
     try {
       const response = await axios.get(`${API}/services/${id}`);
+
       setHotel(response.data);
     } catch (error) {
-      console.error('Failed to fetch hotel:', error);
-      toast.error('Failed to load hotel details');
+      console.error(error);
+
+      toast.error('Failed to load hotel');
     } finally {
       setLoading(false);
     }
@@ -95,20 +99,24 @@ const HotelDetail = () => {
 
   const handleBookNow = async () => {
     if (!user || !token) {
-      toast.error('Please login to book');
+      toast.error('Please login');
+
       navigate('/login');
+
       return;
     }
 
     if (!checkIn || !checkOut) {
-      toast.error('Please select dates');
+      toast.error('Select dates');
+
       return;
     }
 
     const nights = calculateNights();
 
     if (nights < 1) {
-      toast.error('Check-out must be after check-in');
+      toast.error('Invalid dates');
+
       return;
     }
 
@@ -138,17 +146,14 @@ const HotelDetail = () => {
 
       navigate(`/checkout?order_id=${orderResponse.data.id}&type=hotel`);
     } catch (error) {
-      console.error('Booking error:', error);
-      toast.error(error.response?.data?.detail || 'Booking failed');
+      console.error(error);
+
+      toast.error(
+        error.response?.data?.detail || 'Booking failed'
+      );
     } finally {
       setBookingLoading(false);
     }
-  };
-
-  const handleSearch = () => {
-    if (!searchQuery.trim()) return;
-
-    navigate(`/services?search=${encodeURIComponent(searchQuery)}`);
   };
 
   const nextImage = () => {
@@ -162,7 +167,9 @@ const HotelDetail = () => {
   const prevImage = () => {
     if (hotel?.images) {
       setCurrentImageIndex(
-        (prev) => (prev - 1 + hotel.images.length) % hotel.images.length
+        (prev) =>
+          (prev - 1 + hotel.images.length) %
+          hotel.images.length
       );
     }
   };
@@ -170,7 +177,7 @@ const HotelDetail = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-2xl font-orbitron text-primary animate-pulse">
+        <div className="text-xl md:text-2xl font-orbitron text-primary animate-pulse">
           Loading...
         </div>
       </div>
@@ -180,7 +187,7 @@ const HotelDetail = () => {
   if (!hotel) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl text-white/60">
+        <div className="text-white/60 text-lg">
           Hotel not found
         </div>
       </div>
@@ -188,28 +195,26 @@ const HotelDetail = () => {
   }
 
   return (
-    <div
-      className="min-h-screen pt-24 md:pt-32 pb-12 px-4"
-      data-testid="hotel-detail-page"
-    >
-      <div className="container mx-auto max-w-6xl">
+    <div className="min-h-screen pt-24 md:pt-32 pb-12 px-3 sm:px-4 bg-black">
 
-        {/* Back */}
+      <div className="max-w-6xl mx-auto">
+
+        {/* Back Button */}
         <Button
           variant="ghost"
-          className="mb-6 text-white/60 hover:text-white"
+          className="mb-5 text-white/60 hover:text-white text-sm"
           onClick={() => navigate('/services')}
         >
           ← Back to Hotels
         </Button>
 
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid lg:grid-cols-2 gap-6 lg:gap-10">
 
-          {/* LEFT */}
+          {/* LEFT SIDE */}
           <div>
 
             {/* Main Image */}
-            <div className="relative aspect-video overflow-hidden rounded-lg bg-muted mb-4 group">
+            <div className="relative aspect-video overflow-hidden rounded-2xl bg-muted mb-3 group border border-white/10">
 
               {hotel.images && hotel.images.length > 0 ? (
                 <>
@@ -223,117 +228,82 @@ const HotelDetail = () => {
                     <>
                       <button
                         onClick={prevImage}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-black/60 text-white p-2 rounded-full"
                       >
-                        <ChevronLeft className="h-6 w-6" />
+                        <ChevronLeft className="h-5 w-5" />
                       </button>
 
                       <button
                         onClick={nextImage}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                        className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-black/60 text-white p-2 rounded-full"
                       >
-                        <ChevronRight className="h-6 w-6" />
+                        <ChevronRight className="h-5 w-5" />
                       </button>
                     </>
                   )}
                 </>
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-secondary/20">
-                  <Wifi className="h-20 w-20 text-white/20" />
+                  <Wifi className="h-16 w-16 text-white/20" />
                 </div>
               )}
             </div>
 
             {/* Thumbnails */}
             {hotel.images && hotel.images.length > 1 && (
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
+
                 {hotel.images.map((img, idx) => (
                   <button
                     key={idx}
                     onClick={() => setCurrentImageIndex(idx)}
-                    className={`aspect-video rounded overflow-hidden border-2 transition-all ${
+                    className={`aspect-video overflow-hidden rounded-lg border ${
                       idx === currentImageIndex
                         ? 'border-primary'
-                        : 'border-white/10 hover:border-white/30'
+                        : 'border-white/10'
                     }`}
                   >
                     <img
                       src={img}
-                      alt={`View ${idx + 1}`}
+                      alt={`Hotel ${idx}`}
                       className="w-full h-full object-cover"
                     />
                   </button>
                 ))}
+
               </div>
             )}
-
-            {/* Google Map */}
-            {hotel.location && (
-              <div className="mt-6 rounded-xl overflow-hidden border border-white/10">
-                <iframe
-                  title="Hotel Location"
-                  width="100%"
-                  height="300"
-                  frameBorder="0"
-                  style={{ border: 0 }}
-                  src={`https://www.google.com/maps?q=${encodeURIComponent(
-                    hotel.location
-                  )}&output=embed`}
-                  allowFullScreen
-                  loading="lazy"
-                />
-              </div>
-            )}
-
           </div>
 
-          {/* RIGHT */}
+          {/* RIGHT SIDE */}
           <div>
 
-            <div className="flex items-start justify-between mb-4">
+            {/* Top */}
+            <div className="flex items-start justify-between gap-3 mb-4">
 
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
 
                 {/* Hotel Name */}
-                <h1 className="text-4xl font-bold font-orbitron text-white mb-2">
+                <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold font-orbitron text-white leading-tight break-words">
                   {hotel.name}
                 </h1>
 
-                {/* Search Box */}
-                <div className="flex gap-2 mb-4">
-
-                  <input
-                    type="text"
-                    placeholder="Search hotels by location..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyDown={(e) =>
-                      e.key === 'Enter' && handleSearch()
-                    }
-                    className="flex-1 bg-[#0F0F1C] border border-white/10 rounded-lg px-4 py-3 text-white outline-none focus:border-primary"
-                  />
-
-                  <Button
-                    onClick={handleSearch}
-                    className="bg-primary hover:bg-primary/90"
-                  >
-                    <Search className="h-5 w-5" />
-                  </Button>
-                </div>
-
                 {/* Location */}
                 {hotel.location && (
-                  <div className="flex items-center gap-2 text-white/60 mb-2">
-                    <MapPin className="h-5 w-5" />
-                    <span className="font-rajdhani text-lg">
+                  <div className="flex items-center gap-2 text-white/60 mt-3">
+
+                    <MapPin className="h-4 w-4 shrink-0" />
+
+                    <span className="font-rajdhani text-base sm:text-lg break-words">
                       {hotel.location}
                     </span>
+
                   </div>
                 )}
 
                 {/* Nearby */}
                 {userLocation && (
-                  <div className="text-sm text-primary mt-2">
+                  <div className="text-primary text-sm mt-2">
                     Nearby hotel detected based on your location
                   </div>
                 )}
@@ -342,30 +312,35 @@ const HotelDetail = () => {
 
               {/* Rating */}
               {hotel.rating && (
-                <div className="flex items-center gap-2 bg-secondary/20 px-4 py-2 rounded-lg">
-                  <Star className="h-5 w-5 fill-secondary text-secondary" />
-                  <span className="text-xl font-bold font-mono text-white">
+                <div className="flex items-center gap-2 bg-secondary/20 px-3 py-2 rounded-xl shrink-0">
+
+                  <Star className="h-4 w-4 fill-secondary text-secondary" />
+
+                  <span className="text-lg sm:text-xl font-bold text-white">
                     {hotel.rating}
                   </span>
+
                 </div>
               )}
             </div>
 
             {/* Description */}
-            <p className="text-white/80 font-rajdhani text-lg mb-6">
+            <p className="text-white/80 text-base sm:text-lg leading-relaxed font-rajdhani mb-6">
               {hotel.description}
             </p>
 
-            {/* Room */}
+            {/* Room Type */}
             {hotel.room_type && (
-              <div className="mb-4">
-                <span className="text-sm text-white/40">
+              <div className="mb-5">
+
+                <span className="text-white/40 text-sm">
                   Room Type
                 </span>
 
-                <div className="text-lg text-secondary font-mono">
+                <div className="text-primary text-2xl sm:text-3xl font-mono mt-1 break-words">
                   {hotel.room_type}
                 </div>
+
               </div>
             )}
 
@@ -373,53 +348,79 @@ const HotelDetail = () => {
             {hotel.amenities && hotel.amenities.length > 0 && (
               <div className="mb-6">
 
-                <span className="text-sm text-white/40 mb-2 block">
+                <span className="text-white/40 text-sm block mb-3">
                   Amenities
                 </span>
 
                 <div className="flex flex-wrap gap-2">
+
                   {hotel.amenities.map((amenity, idx) => (
                     <span
                       key={idx}
-                      className="px-3 py-1 bg-white/5 border border-white/10 rounded text-sm text-white/70 font-rajdhani"
+                      className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white/70"
                     >
                       {amenity}
                     </span>
                   ))}
+
                 </div>
 
               </div>
             )}
 
-            {/* Booking Card */}
-            <Card className="bg-[#0F0F1C]/80 backdrop-blur-md border-white/10 p-6">
+            {/* MAP BELOW AMENITIES */}
+            {hotel.location && (
+              <div className="mb-6 rounded-2xl overflow-hidden border border-white/10">
 
+                <iframe
+                  title="Hotel Location"
+                  width="100%"
+                  height="260"
+                  frameBorder="0"
+                  style={{ border: 0 }}
+                  src={`https://www.google.com/maps?q=${encodeURIComponent(
+                    hotel.location
+                  )}&output=embed`}
+                  allowFullScreen
+                  loading="lazy"
+                />
+
+              </div>
+            )}
+
+            {/* Booking Card */}
+            <Card className="bg-[#0F0F1C]/90 border border-white/10 backdrop-blur-md p-4 sm:p-6 rounded-2xl">
+
+              {/* Price */}
               <div className="mb-6">
-                <div className="text-3xl font-bold text-primary font-mono mb-1">
+
+                <div className="text-4xl sm:text-5xl font-bold text-primary font-mono">
                   ₹{hotel.price_per_night.toFixed(2)}
                 </div>
 
-                <div className="text-sm text-white/40">
+                <div className="text-white/40 mt-1">
                   per night
                 </div>
+
               </div>
 
-              <div className="space-y-4 mb-6">
+              <div className="space-y-4">
 
                 {/* Checkin */}
                 <div>
 
-                  <label className="text-white/80 font-rajdhani mb-2 block">
+                  <label className="text-white/80 block mb-2">
                     Check-in Date
                   </label>
 
                   <Popover>
+
                     <PopoverTrigger asChild>
 
                       <Button
                         variant="outline"
                         className={cn(
-                          'w-full justify-start text-left font-mono bg-input border-white/10',
+                          'w-full justify-start bg-input border-white/10 text-left h-12',
                           !checkIn && 'text-white/40'
                         )}
                       >
@@ -443,23 +444,25 @@ const HotelDetail = () => {
                       />
 
                     </PopoverContent>
+
                   </Popover>
                 </div>
 
                 {/* Checkout */}
                 <div>
 
-                  <label className="text-white/80 font-rajdhani mb-2 block">
+                  <label className="text-white/80 block mb-2">
                     Check-out Date
                   </label>
 
                   <Popover>
+
                     <PopoverTrigger asChild>
 
                       <Button
                         variant="outline"
                         className={cn(
-                          'w-full justify-start text-left font-mono bg-input border-white/10',
+                          'w-full justify-start bg-input border-white/10 text-left h-12',
                           !checkOut && 'text-white/40'
                         )}
                       >
@@ -485,17 +488,18 @@ const HotelDetail = () => {
                       />
 
                     </PopoverContent>
+
                   </Popover>
                 </div>
 
                 {/* Guests */}
                 <div>
 
-                  <label className="text-white/80 font-rajdhani mb-2 block">
+                  <label className="text-white/80 block mb-3">
                     Guests
                   </label>
 
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center justify-between gap-4">
 
                     <Button
                       variant="outline"
@@ -503,17 +507,19 @@ const HotelDetail = () => {
                       onClick={() =>
                         setGuests(Math.max(1, guests - 1))
                       }
-                      className="bg-input border-white/10"
+                      className="bg-input border-white/10 h-12 w-12 shrink-0"
                     >
                       -
                     </Button>
 
-                    <div className="flex items-center gap-2 flex-1 justify-center">
+                    <div className="flex items-center gap-2">
+
                       <Users className="h-5 w-5 text-white/60" />
 
-                      <span className="text-2xl font-mono text-white">
+                      <span className="text-3xl font-mono text-white">
                         {guests}
                       </span>
+
                     </div>
 
                     <Button
@@ -522,61 +528,65 @@ const HotelDetail = () => {
                       onClick={() =>
                         setGuests(Math.min(10, guests + 1))
                       }
-                      className="bg-input border-white/10"
+                      className="bg-input border-white/10 h-12 w-12 shrink-0"
                     >
                       +
                     </Button>
 
                   </div>
                 </div>
+
+                {/* Total */}
+                {checkIn &&
+                  checkOut &&
+                  calculateNights() > 0 && (
+                    <div className="bg-secondary/10 border border-secondary/30 rounded-xl p-4">
+
+                      <div className="flex justify-between text-white/80 mb-2">
+                        <span>Duration</span>
+
+                        <span>
+                          {calculateNights()} night
+                          {calculateNights() > 1
+                            ? 's'
+                            : ''}
+                        </span>
+                      </div>
+
+                      <div className="flex justify-between text-2xl font-bold text-primary border-t border-white/10 pt-3">
+
+                        <span>Total</span>
+
+                        <span>
+                          ₹{calculateTotal().toFixed(2)}
+                        </span>
+
+                      </div>
+
+                    </div>
+                  )}
+
+                {/* Book Button */}
+                <Button
+                  onClick={handleBookNow}
+                  disabled={
+                    bookingLoading ||
+                    !checkIn ||
+                    !checkOut
+                  }
+                  className="w-full bg-primary hover:bg-primary/90 h-14 text-lg font-bold uppercase mt-2"
+                >
+                  {bookingLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    'Book Now'
+                  )}
+                </Button>
+
               </div>
-
-              {/* Total */}
-              {checkIn &&
-                checkOut &&
-                calculateNights() > 0 && (
-                  <div className="bg-secondary/10 border border-secondary/30 rounded p-4 mb-4">
-
-                    <div className="flex justify-between text-white/80 font-rajdhani mb-2">
-                      <span>Duration:</span>
-
-                      <span className="font-mono">
-                        {calculateNights()} night
-                        {calculateNights() > 1 ? 's' : ''}
-                      </span>
-                    </div>
-
-                    <div className="flex justify-between text-xl font-bold text-primary font-mono pt-2 border-t border-white/10">
-                      <span>Total:</span>
-
-                      <span>
-                        ₹{calculateTotal().toFixed(2)}
-                      </span>
-                    </div>
-
-                  </div>
-                )}
-
-              {/* Book */}
-              <Button
-                onClick={handleBookNow}
-                disabled={
-                  bookingLoading ||
-                  !checkIn ||
-                  !checkOut
-                }
-                className="w-full bg-primary hover:bg-primary/90 font-orbitron uppercase py-6 text-lg"
-              >
-                {bookingLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Processing...
-                  </>
-                ) : (
-                  'Book Now'
-                )}
-              </Button>
-
             </Card>
 
           </div>
