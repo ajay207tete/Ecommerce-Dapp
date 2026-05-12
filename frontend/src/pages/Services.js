@@ -145,7 +145,7 @@ const Services = () => {
         <div className="mb-12">
 
           <h1 className="text-4xl md:text-6xl font-bold font-orbitron uppercase mb-4 text-white">
-            Hotel Bookings
+            Book
           </h1>
 
           <p className="text-lg text-white/60 font-rajdhani mb-6">
@@ -153,28 +153,46 @@ const Services = () => {
           </p>
 
           {/* Search Bar */}
-          <div className="flex gap-3">
+<div className="flex gap-3 w-full">
 
-            <div className="relative flex-1">
+  <div className="relative flex-1">
 
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/40" />
+    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/40" />
 
-              <input
-                type="text"
-                placeholder="Search hotels by name or location..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-[#0F0F1C] border border-white/10 rounded-xl pl-12 pr-4 py-4 text-white outline-none focus:border-primary"
-              />
-            </div>
+    <input
+      type="text"
+      placeholder="Search hotels by name or location..."
+      value={searchQuery}
+      onChange={(e) => setSearchQuery(e.target.value)}
+      className="
+        w-full
+        h-12
+        bg-[#0F0F1C]
+        border
+        border-white/10
+        rounded-xl
+        pl-12
+        pr-4
+        text-white
+        outline-none
+        focus:border-primary
+      "
+    />
+  </div>
 
-            <Button
-              className="bg-primary hover:bg-primary/90 px-6"
-            >
-              Search
-            </Button>
+  <Button
+    className="
+      h-12
+      min-w-[120px]
+      bg-primary
+      hover:bg-primary/90
+      rounded-xl
+    "
+  >
+    Search
+  </Button>
 
-          </div>
+</div>
 
           {/* Nearby Badge */}
           {userLocation && (
