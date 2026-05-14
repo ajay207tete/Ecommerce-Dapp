@@ -77,6 +77,8 @@ function App() {
                 <Route path="/payment-success" element={<PaymentSuccess />} />
               </Routes>
               <Toaster position="top-right" />
+              <SpeedInsights />
+              <Analytics />
             </div>
            </div>
           </BrowserRouter>
