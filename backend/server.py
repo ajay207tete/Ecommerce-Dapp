@@ -75,6 +75,8 @@ class Service(BaseModel):
     price: float
     duration: str = ""
     category: str = ""
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
