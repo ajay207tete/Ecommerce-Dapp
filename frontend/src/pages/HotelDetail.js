@@ -378,9 +378,13 @@ const HotelDetail = () => {
                   height="100"
                   frameBorder="0"
                   style={{ border: 0 }}
-                  src={`https://www.google.com/maps?q=${encodeURIComponent(
-                    hotel.location
-                  )}&output=embed`}
+                  src={
+  hotel.latitude && hotel.longitude
+    ? `https://www.google.com/maps?q=${hotel.latitude},${hotel.longitude}&z=17&output=embed`
+    : `https://www.google.com/maps?q=${encodeURIComponent(
+        hotel.location
+      )}&output=embed`
+}
                   allowFullScreen
                   loading="lazy"
                 />
