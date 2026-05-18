@@ -22,10 +22,17 @@ import resend
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / ".env")
 
-mongo_url = os.getenv["MONGO_URL"]
+mongo_url = os.getenv("MONGO_URL")
+db_name = os.getenv("DB_NAME")
+
+if not mongo_url:
+    raise Exception("MONGO_URL missing")
+
+if not db_name:
+    raise Exception("DB_NAME missing")
 
 client = AsyncIOMotorClient(mongo_url)
-db = client[os.getenv["DB_NAME"]]
+db = client[db_name]
 
 # =========================
 # APP
