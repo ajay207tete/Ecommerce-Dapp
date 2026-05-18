@@ -42,7 +42,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(
     os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "10080")
 )
 
-RESEND_API_KEY= os.getenv("RESEND_API_KEY")
+resend.api_key= os.getenv("RESEND_API_KEY")
 
 # =========================
 # LOGGER
