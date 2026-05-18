@@ -16,6 +16,7 @@ import hmac
 import hashlib
 import json
 import httpx
+import resend
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -30,6 +31,7 @@ api_router = APIRouter(prefix="/api")
 security = HTTPBearer()
 
 JWT_SECRET = os.getenv("JWT_SECRET")
+resend.api.key= os.getenv("RESEND_API_KEY")
 JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "10080"))
 
@@ -172,6 +174,140 @@ def create_access_token(data: dict) -> str:
     return jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 
+async def send_welcome_email(user_email: str):
+
+try:
+
+    resend.Emails.send({
+        "from": "Thruster <info@thruster.in>",
+        "to": [user_email],
+        "subject": "Welcome to Thruster 🚀",
+        "html": """
+        <div style="
+            font-family: Arial, sans-serif;
+            padding: 30px;
+            background-color: #f8f9fb;
+            color: #111;
+        ">
+
+            <div style="
+                max-width: 650px;
+                margin: auto;
+                background: white;
+                padding: 40px;
+                border-radius: 14px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            ">
+
+                <h1 style="
+                    color: #111;
+                    font-size: 32px;
+                    margin-bottom: 10px;
+                ">
+                    Welcome to Thruster 🚀
+                </h1>
+
+                <p style="
+                    font-size: 16px;
+                    line-height: 1.8;
+                    color: #444;
+                ">
+                    Your account has been successfully created.
+                </p>
+
+                <p style="
+                    font-size: 16px;
+                    line-height: 1.8;
+                    color: #444;
+                ">
+                    Thruster is India's first blockchain-powered booking and commerce platform,
+                    where every product and service is embedded with NFT technology and supports
+                    both crypto and fiat payments.
+                </p>
+
+                <div style="
+                    margin-top: 25px;
+                    padding: 20px;
+                    background: #f3f6ff;
+                    border-radius: 12px;
+                ">
+
+                    <h2 style="
+                        margin-top: 0;
+                        font-size: 22px;
+                        color: #111;
+                    ">
+                        Explore Thruster
+                    </h2>
+
+                    <ul style="
+                        padding-left: 20px;
+                        line-height: 2;
+                        color: #333;
+                        font-size: 15px;
+                    ">
+                        <li>Premium Hotel & Travel Booking</li>
+                        <li>Blockchain-powered NFT ownership</li>
+                        <li>Fashion & Digital Commerce</li>
+                        <li>Crypto + Fiat Payments</li>
+                        <li>Exclusive Reward Ecosystem</li>
+                        <li>Secure Decentralized Transactions</li>
+                    </ul>
+
+                </div>
+
+                <p style="
+                    margin-top: 30px;
+                    font-size: 15px;
+                    line-height: 1.8;
+                    color: #555;
+                ">
+                    We are building the next generation of commerce and booking infrastructure
+                    powered by blockchain innovation.
+                </p>
+
+                <a href="https://thruster.in"
+                   style="
+                    display: inline-block;
+                    margin-top: 25px;
+                    background: #111;
+                    color: white;
+                    padding: 14px 28px;
+                    border-radius: 10px;
+                    text-decoration: none;
+                    font-weight: bold;
+                   ">
+                    Explore Platform
+                </a>
+
+                <hr style="
+                    margin-top: 40px;
+                    border: none;
+                    border-top: 1px solid #eee;
+                ">
+
+                <p style="
+                    font-size: 13px;
+                    color: #777;
+                    margin-top: 20px;
+                    line-height: 1.6;
+                ">
+                    Thruster Technologies Pvt. Ltd.<br>
+                    India’s Blockchain Commerce Infrastructure
+                </p>
+
+            </div>
+
+        </div>
+        """
+    })
+
+    logger.info(f"Welcome email sent to {user_email}")
+
+except Exception as e:
+    logger.error(f"Resend Error: {e}")
+
+
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> User:
     try:
         token = credentials.credentials
@@ -207,6 +343,7 @@ async def register(user_data: UserRegister):
     user_doc['created_at'] = user_doc['created_at'].isoformat()
     
     await db.users.insert_one(user_doc)
+    await send_welcome_email(user.email)
     
     token = create_access_token({"sub": user.id, "email": user.email})
     return {"token": token, "user": user}
