@@ -22,10 +22,10 @@ import resend
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / ".env")
 
-mongo_url = os.environ["MONGO_URL"]
+mongo_url = os.getenv["MONGO_URL"]
 
 client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ["DB_NAME"]]
+db = client[os.getenv["DB_NAME"]]
 
 # =========================
 # APP
@@ -42,7 +42,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(
     os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "10080")
 )
 
-resend.api.key = os.getenv("RESEND_API_KEY")
+RESEND_API_KEY= os.getenv("RESEND_API_KEY")
 
 # =========================
 # LOGGER
