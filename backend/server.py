@@ -785,6 +785,14 @@ async def get_admin_stats(
 
 
 # =========================
+# ROOT APP ROUTE
+# =========================
+
+@app.get("/")
+async def home():
+    return {
+        "message": "Thruster Backend Running 🚀"
+    }
 # ROOT
 # =========================
 
