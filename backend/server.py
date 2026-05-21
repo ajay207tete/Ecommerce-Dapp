@@ -695,15 +695,17 @@ async def create_hotel_booking(
     order_doc = order.model_dump()
 
     order_doc["booking_details"] = {
-        "hotel_name": booking.hotel_name,
-        "location": booking.location,
-        "check_in": booking.check_in,
-        "check_out": booking.check_out,
-        "guests": booking.guests,
-        "nights": booking.nights,
-        "room_type": booking.room_type,
-        "hotel_image": booking.hotel_image
-    }
+    "hotel_name": booking.hotel_name,
+    "guest_name": booking.full_name,
+    "guest_phone": booking.phone,
+    "location": booking.location,
+    "check_in": booking.check_in,
+    "check_out": booking.check_out,
+    "guests": booking.guests,
+    "nights": booking.nights,
+    "room_type": booking.room_type,
+    "hotel_image": booking.hotel_image
+}
 
     await db.orders.insert_one(order_doc)
 
