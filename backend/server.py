@@ -663,10 +663,6 @@ async def create_order(
         order.model_dump()
     )
 
-    await db.carts.delete_one({
-        "user_id": current_user.id
-    })
-
     return order
 
 
