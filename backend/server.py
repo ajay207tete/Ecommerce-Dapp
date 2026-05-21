@@ -468,6 +468,21 @@ async def get_products(category: Optional[str] = None):
 
     return products
 
+@api_router.get("/products/{product_id}")
+async def get_product(product_id: str):
+
+    product = await db.products.find_one(
+        {"id": product_id},
+        {"_id": 0}
+    )
+
+    if not product:
+        raise HTTPException(
+            status_code=404,
+            detail="Product not found"
+        )
+
+    return product
 
 @api_router.post("/products")
 async def create_product(
@@ -507,6 +522,21 @@ async def get_services(category: Optional[str] = None):
 
     return services
 
+@api_router.get("/services/{service_id}")
+async def get_service(service_id: str):
+
+    service = await db.services.find_one(
+        {"id": service_id},
+        {"_id": 0}
+    )
+
+    if not service:
+        raise HTTPException(
+            status_code=404,
+            detail="Service not found"
+        )
+
+    return service
 
 @api_router.post("/services")
 async def create_service(
