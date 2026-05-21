@@ -737,6 +737,68 @@ async def get_payment_status(
 
 
 # =========================
+# PAYMENT SUCCESS
+# =========================
+
+@api_router.post("/payments/verify")
+async def verify_payment(
+    order_id: str,
+    current_user: User = Depends(get_current_user)
+):
+
+    order = await db.orders.find_one(
+        {"id": order_id},
+        {"_id": 0}
+    )
+
+    if not order:
+        raise HTTPException(
+            status_code=404,
+            detail="Order not found"
+        )
+
+    payment = await db.payments.find_one(
+        {"order_id": order_id},
+        {"_id": 0}
+    )
+
+    if not payment:
+        raise HTTPException(
+            status_code=404,
+            detail="Payment not found"
+        )
+
+    # MARK PAYMENT SUCCESS
+    await db.payments.update_one(
+        {"id": payment["id"]},
+        {
+            "$set": {
+                "status": "completed"
+            }
+        }
+    )
+
+    # MARK ORDER SUCCESS
+    await db.orders.update_one(
+        {"id": order_id},
+        {
+            "$set": {
+                "status": "completed"
+            }
+        }
+    )
+
+    # CLEAR CART ONLY NOW
+    await db.carts.delete_one({
+        "user_id": current_user.id
+    })
+
+    return {
+        "success": True,
+        "message": "Payment verified"
+    }
+
+# =========================
 # NFTS
 # =========================
 
