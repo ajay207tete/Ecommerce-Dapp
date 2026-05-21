@@ -735,6 +735,124 @@ async def get_payment_status(
 
     return payment
 
+# =========================
+# CASHFREE PAYMENT
+# =========================
+
+import requests
+
+CASHFREE_APP_ID = os.getenv("CASHFREE_CLIENT_ID")
+CASHFREE_SECRET_KEY = os.getenv("CASHFREE_CLIENT_SECRET")
+
+CASHFREE_BASE_URL = "https://api.cashfree.com/pg"
+
+
+@api_router.post("/payments/create-inr")
+async def create_inr_payment(
+    order_id: str,
+    current_user: User = Depends(get_current_user)
+):
+
+    # FIND ORDER
+    order = await db.orders.find_one(
+        {"id": order_id},
+        {"_id": 0}
+    )
+
+    if not order:
+        raise HTTPException(
+            status_code=404,
+            detail="Order not found"
+        )
+
+    # CREATE CASHFREE ORDER ID
+    cashfree_order_id = f"thruster_{uuid.uuid4().hex[:12]}"
+
+    headers = {
+        "x-client-id": CASHFREE_APP_ID,
+        "x-client-secret": CASHFREE_SECRET_KEY,
+        "x-api-version": "2023-08-01",
+        "Content-Type": "application/json"
+    }
+
+    payload = {
+        "order_id": cashfree_order_id,
+        "order_amount": float(order["total"]),
+        "order_currency": "INR",
+
+        "customer_details": {
+            "customer_id": current_user.id,
+            "customer_email": current_user.email,
+            "customer_phone": (
+                order.get("shipping_address", {})
+                .get("phone", "9999999999")
+            )
+        },
+
+        "order_meta": {
+            "return_url":
+            f"https://www.thruster.in/payment-success?order_id={order_id}"
+        }
+    }
+
+    try:
+
+        response = requests.post(
+            f"{CASHFREE_BASE_URL}/orders",
+            headers=headers,
+            json=payload
+        )
+
+        data = response.json()
+
+        logger.info(data)
+
+        if response.status_code != 200:
+            raise HTTPException(
+                status_code=400,
+                detail=data
+            )
+
+        # SAVE PAYMENT
+        payment = Payment(
+            order_id=order_id,
+            amount=order["total"],
+            currency="INR",
+            method="cashfree",
+            status="pending",
+            payment_provider_id=data["cf_order_id"]
+        )
+
+        await db.payments.insert_one(
+            payment.model_dump()
+        )
+
+        # UPDATE ORDER
+        await db.orders.update_one(
+            {"id": order_id},
+            {
+                "$set": {
+                    "payment_id": payment.id
+                }
+            }
+        )
+
+        return {
+            "success": True,
+            "payment_session_id":
+            data["payment_session_id"],
+
+            "cf_order_id":
+            data["cf_order_id"]
+        }
+
+    except Exception as e:
+        logger.error(str(e))
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
 
 # =========================
 # PAYMENT SUCCESS
