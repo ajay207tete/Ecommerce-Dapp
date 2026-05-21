@@ -211,6 +211,8 @@ class HotelBookingRequest(BaseModel):
     nights: int
     room_type: str
     total: float
+    full_name: Optional[str] = None
+    phone: Optional[str] = None
     location: Optional[str] = None
     hotel_image: Optional[str] = None
 
