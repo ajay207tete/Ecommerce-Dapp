@@ -119,41 +119,79 @@ const Checkout = () => {
   // =========================
   // SUBMIT
   // =========================
+     const handleSubmit = async (e) => {
 
-  const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    e.preventDefault();
+  if (!user || !token) {
 
-    if (!user || !token) {
-      toast.error('Please login first');
-      navigate('/login');
-      return;
-    }
+    toast.error('Please login first');
 
-    // HOTEL PAYMENT
-    if (orderId && existingOrder) {
+    navigate('/login');
 
-      await processPayment(orderId);
+    return;
+  }
 
-      return;
-    }
+  setLoading(true);
 
-    // EMPTY CART
-    if (cartItems.length === 0) {
+  try {
 
-      toast.error('Cart is empty');
+    // =========================
+    // HOTEL BOOKING
+    // =========================
 
-      return;
-    }
+    if (orderType === 'hotel') {
 
-    setLoading(true);
+      const bookingPayload = {
 
-    try {
+        hotel_id:
+          existingOrder?.items?.[0]?.item_id ||
+          orderId,
 
-      // CREATE ORDER
-      const orderResponse = await axios.post(
-        `${API}/orders`,
-        shippingInfo,
+        hotel_name:
+          existingOrder?.booking_details?.hotel_name ||
+          existingOrder?.items?.[0]?.name ||
+          'Hotel Booking',
+
+        check_in:
+          existingOrder?.booking_details?.check_in || '',
+
+        check_out:
+          existingOrder?.booking_details?.check_out || '',
+
+        guests:
+          existingOrder?.booking_details?.guests || 1,
+
+        nights:
+          existingOrder?.booking_details?.nights || 1,
+
+        room_type:
+          existingOrder?.booking_details?.room_type ||
+          'Standard',
+
+        total:
+          existingOrder?.total || orderTotal,
+
+        full_name:
+          shippingInfo.full_name,
+
+        phone:
+          shippingInfo.phone,
+
+        location:
+          existingOrder?.booking_details?.location || '',
+
+        hotel_image:
+          existingOrder?.booking_details?.hotel_image || ''
+      };
+
+      // CREATE HOTEL BOOKING ORDER
+      const bookingResponse = await axios.post(
+
+        `${API}/orders/hotel-booking`,
+
+        bookingPayload,
+
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -161,25 +199,68 @@ const Checkout = () => {
         }
       );
 
-      const newOrderId = orderResponse.data.id;
+      const bookingOrderId =
+        bookingResponse.data.id;
 
-      await processPayment(newOrderId);
-
-    } catch (error) {
-
-      console.error(error);
-
-      toast.error(
-        error?.response?.data?.detail ||
-        'Checkout failed'
+      // PROCESS PAYMENT
+      await processPayment(
+        bookingOrderId
       );
 
-    } finally {
+      return;
+    }
+
+    // =========================
+    // NORMAL PRODUCT ORDER
+    // =========================
+
+    if (cartItems.length === 0) {
+
+      toast.error('Cart is empty');
 
       setLoading(false);
-    }
-  };
 
+      return;
+    }
+
+    // CREATE NORMAL ORDER
+    const orderResponse = await axios.post(
+
+      `${API}/orders`,
+
+      shippingInfo,
+
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    const newOrderId =
+      orderResponse.data.id;
+
+    // PAYMENT
+    await processPayment(
+      newOrderId
+    );
+
+  } catch (error) {
+
+    console.error(error);
+
+    toast.error(
+
+      error?.response?.data?.detail ||
+      'Checkout failed'
+    );
+
+  } finally {
+
+    setLoading(false);
+  }
+};
+  
   // =========================
   // PAYMENT
   // =========================
