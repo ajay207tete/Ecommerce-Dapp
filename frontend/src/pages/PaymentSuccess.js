@@ -4,61 +4,85 @@ import axios from "axios";
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export default function PaymentSuccess() {
-  const [status, setStatus] = useState("Checking payment...");
-  const params = new URLSearchParams(window.location.search);
-
-const paymentId =
-  params.get("payment_id") ||   // NOWPayments
-  params.get("paymentId") ||    // fallback
-  params.get("order_id");       // Cashfree
+  const [status, setStatus] = useState("Verifying payment...");
 
   useEffect(() => {
-  if (paymentId === null) return; // wait
 
-    if (!paymentId) {
-    setStatus("❌ Invalid payment link");
-    return;
-  }
-
-    const checkPayment = async () => {
+    const verifyPayment = async () => {
       try {
-        const res = await axios.get(`${API}/payments/status`, {
-  params: { id: paymentId }
-});
-        
-        if (res.data.status === "finished" || res.data.status === "completed") {
-          
-          await axios.post(`${API}/payments/confirm`, {
-            payment_id: paymentId
-          }, {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`
-            }
-          });
 
-          setStatus("✅ Payment Successful & Order Confirmed!");
-setTimeout(() => {
-    window.location.href = "/dashboard"; // or /orders
-  }, 3000);
-        } else {
-          setStatus("⏳ Waiting for confirmation...");
+        // GET ORDER ID FROM URL
+        const params = new URLSearchParams(window.location.search);
+
+        const orderId =
+          params.get("order_id") ||
+          params.get("orderId");
+
+        if (!orderId) {
+          setStatus("❌ Invalid payment link");
+          return;
         }
-      } catch (err) {
-        setStatus("❌ Error verifying payment");
+
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+          setStatus("❌ Please login again");
+          return;
+        }
+
+        // VERIFY PAYMENT
+        const response = await axios.post(
+          `${API}/payments/verify?order_id=${orderId}`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+
+        if (response.data.success) {
+
+          setStatus("✅ Payment Successful!");
+
+          // OPTIONAL SMALL DELAY
+          setTimeout(() => {
+            window.location.href = "/dashboard";
+          }, 2500);
+
+        } else {
+
+          setStatus("❌ Payment verification failed");
+
+        }
+
+      } catch (error) {
+
+        console.error(error);
+
+        setStatus(
+          error.response?.data?.detail ||
+          "❌ Payment verification failed"
+        );
       }
     };
 
-    checkPayment();
-    const interval = setInterval(checkPayment, 5000);
+    verifyPayment();
 
-    return () => clearInterval(interval);
-  }, [paymentId]);
+  }, []);
 
   return (
-    <div className="min-h-screen flex items-center justify-center text-white text-center">
-      <div>
-        <h1 className="text-4xl font-bold mb-4">Payment Status</h1>
-        <p className="text-xl">{status}</p>
+    <div className="min-h-screen flex items-center justify-center bg-black text-white px-4">
+      <div className="bg-[#0F0F1C] border border-white/10 rounded-2xl p-10 text-center max-w-md w-full">
+
+        <h1 className="text-4xl font-bold mb-6 font-orbitron">
+          Payment Status
+        </h1>
+
+        <p className="text-xl text-primary">
+          {status}
+        </p>
+
       </div>
     </div>
   );
