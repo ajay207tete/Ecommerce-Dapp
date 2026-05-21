@@ -855,6 +855,112 @@ async def create_inr_payment(
         )
 
 # =========================
+# NOWPAYMENTS CRYPTO PAYMENT
+# =========================
+
+NOWPAYMENTS_API_KEY = os.getenv("NOWPAYMENTS_API_KEY")
+
+@api_router.post("/payments/create-crypto")
+async def create_crypto_payment(
+    order_id: str,
+    pay_currency: str = "ton",
+    current_user: User = Depends(get_current_user)
+):
+
+    order = await db.orders.find_one(
+        {"id": order_id},
+        {"_id": 0}
+    )
+
+    if not order:
+        raise HTTPException(
+            status_code=404,
+            detail="Order not found"
+        )
+
+    headers = {
+        "x-api-key": NOWPAYMENTS_API_KEY,
+        "Content-Type": "application/json"
+    }
+
+    payload = {
+        "price_amount": float(order["total"]),
+        "price_currency": "usd",
+        "pay_currency": pay_currency,
+        "order_id": order_id,
+        "order_description": "Thruster Order Payment",
+        "ipn_callback_url":
+        "https://www.thruster.in/api/payments/ipn",
+
+        "success_url":
+        f"https://www.thruster.in/payment-success?order_id={order_id}",
+
+        "cancel_url":
+        "https://www.thruster.in/checkout"
+    }
+
+    try:
+
+        response = requests.post(
+            "https://api.nowpayments.io/v1/payment",
+            headers=headers,
+            json=payload
+        )
+
+        data = response.json()
+
+        print(data)
+
+        if response.status_code not in [200, 201]:
+            raise HTTPException(
+                status_code=400,
+                detail=data
+            )
+
+        payment = Payment(
+            order_id=order_id,
+            amount=order["total"],
+            currency=pay_currency,
+            method="nowpayments",
+            status="pending",
+            payment_provider_id=str(data["payment_id"]),
+            pay_address=data.get("pay_address"),
+            pay_amount=data.get("pay_amount")
+        )
+
+        await db.payments.insert_one(
+            payment.model_dump()
+        )
+
+        await db.orders.update_one(
+            {"id": order_id},
+            {
+                "$set": {
+                    "payment_id": payment.id
+                }
+            }
+        )
+
+        return {
+            "success": True,
+            "payment_url": data.get("invoice_url"),
+            "payment_id": data["payment_id"],
+            "pay_address": data.get("pay_address"),
+            "pay_amount": data.get("pay_amount"),
+            "currency": pay_currency,
+            "amount": order["total"]
+        }
+
+    except Exception as e:
+
+        print(str(e))
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
+
+# =========================
 # PAYMENT SUCCESS
 # =========================
 
