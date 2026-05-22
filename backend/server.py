@@ -805,10 +805,9 @@ async def create_inr_payment(
             f"https://www.thruster.in/payment-success?order_id={order_id}"
         }
     }
+try:
 
-    try:
-
-        response = requests.post(
+    response = requests.post(
         f"{CASHFREE_BASE_URL}/orders",
         headers=headers,
         json=payload
@@ -830,7 +829,6 @@ async def create_inr_payment(
             detail=data
         )
 
-    # SAVE PAYMENT
     payment = Payment(
         order_id=order_id,
         amount=order["total"],
@@ -855,11 +853,8 @@ async def create_inr_payment(
 
     return {
         "success": True,
-        "payment_session_id":
-        data["payment_session_id"],
-
-        "cf_order_id":
-        data["cf_order_id"]
+        "payment_session_id": data["payment_session_id"],
+        "cf_order_id": data["cf_order_id"]
     }
 
 except HTTPException as e:
@@ -873,6 +868,7 @@ except Exception as e:
         status_code=500,
         detail=f"Cashfree Error: {str(e)}"
     )
+  
 # =========================
 # NOWPAYMENTS CRYPTO PAYMENT
 # =========================
