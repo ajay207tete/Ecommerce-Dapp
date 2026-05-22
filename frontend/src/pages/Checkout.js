@@ -302,26 +302,40 @@ const Checkout = () => {
         }
 
         // CASHFREE SDK CHECK
-        if (!window.Cashfree) {
+        if (
+  typeof window.Cashfree !== "function"
+) {
+  toast.error(
+    "Cashfree SDK not loaded"
+  );
 
-          toast.error('Cashfree SDK not loaded');
-
-          setLoading(false);
-
-          return;
-        }
+  return;
+}
 
         // PRODUCTION MODE
         const cashfree = window.Cashfree({
           mode: 'production'
         });
 
-        await cashfree.checkout({
-          paymentSessionId:
-            response.data.payment_session_id,
+        const checkoutOptions = {
+  paymentSessionId:
+    response.data.payment_session_id,
 
-          redirectTarget: '_self'
-        });
+  redirectTarget: "_self",
+};
+
+cashfree.checkout(checkoutOptions)
+.then((result) => {
+
+  console.log("Cashfree Result:", result);
+
+})
+.catch((err) => {
+
+  console.error("Cashfree Error:", err);
+
+  toast.error("Cashfree checkout failed");
+});
 
         return;
       }
