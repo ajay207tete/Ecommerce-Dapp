@@ -311,9 +311,9 @@ const Checkout = () => {
           return;
         }
 
-        // SANDBOX MODE
+        // PRODUCTION MODE
         const cashfree = window.Cashfree({
-          mode: 'sandbox'
+          mode: 'production'
         });
 
         await cashfree.checkout({
