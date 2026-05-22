@@ -764,7 +764,6 @@ async def create_inr_payment(
     current_user: User = Depends(get_current_user)
 ):
 
-    # FIND ORDER
     order = await db.orders.find_one(
         {"id": order_id},
         {"_id": 0}
@@ -776,7 +775,6 @@ async def create_inr_payment(
             detail="Order not found"
         )
 
-    # CREATE CASHFREE ORDER ID
     cashfree_order_id = f"thruster_{uuid.uuid4().hex[:12]}"
 
     headers = {
@@ -790,7 +788,6 @@ async def create_inr_payment(
         "order_id": cashfree_order_id,
         "order_amount": float(order["total"]),
         "order_currency": "INR",
-
         "customer_details": {
             "customer_id": current_user.id,
             "customer_email": current_user.email,
@@ -799,75 +796,73 @@ async def create_inr_payment(
                 .get("phone", "9999999999")
             )
         },
-
         "order_meta": {
             "return_url":
             f"https://www.thruster.in/payment-success?order_id={order_id}"
         }
     }
-try:
 
-    response = requests.post(
-        f"{CASHFREE_BASE_URL}/orders",
-        headers=headers,
-        json=payload
-    )
+    try:
 
-    data = response.json()
-
-    logger.info(f"CASHFREE STATUS CODE: {response.status_code}")
-    logger.info(f"CASHFREE RESPONSE: {data}")
-    logger.info(f"CASHFREE HEADERS: {headers}")
-    logger.info(f"CASHFREE PAYLOAD: {payload}")
-
-    if response.status_code not in [200, 201]:
-
-        logger.error("CASHFREE FAILED")
-
-        raise HTTPException(
-            status_code=400,
-            detail=data
+        response = requests.post(
+            f"{CASHFREE_BASE_URL}/orders",
+            headers=headers,
+            json=payload
         )
 
-    payment = Payment(
-        order_id=order_id,
-        amount=order["total"],
-        currency="INR",
-        method="cashfree",
-        status="pending",
-        payment_provider_id=data["cf_order_id"]
-    )
+        data = response.json()
 
-    await db.payments.insert_one(
-        payment.model_dump()
-    )
+        logger.info(f"CASHFREE STATUS CODE: {response.status_code}")
+        logger.info(f"CASHFREE RESPONSE: {data}")
 
-    await db.orders.update_one(
-        {"id": order_id},
-        {
-            "$set": {
-                "payment_id": payment.id
+        if response.status_code not in [200, 201]:
+
+            logger.error("CASHFREE FAILED")
+
+            raise HTTPException(
+                status_code=400,
+                detail=data
+            )
+
+        payment = Payment(
+            order_id=order_id,
+            amount=order["total"],
+            currency="INR",
+            method="cashfree",
+            status="pending",
+            payment_provider_id=data["cf_order_id"]
+        )
+
+        await db.payments.insert_one(
+            payment.model_dump()
+        )
+
+        await db.orders.update_one(
+            {"id": order_id},
+            {
+                "$set": {
+                    "payment_id": payment.id
+                }
             }
+        )
+
+        return {
+            "success": True,
+            "payment_session_id": data["payment_session_id"],
+            "cf_order_id": data["cf_order_id"]
         }
-    )
 
-    return {
-        "success": True,
-        "payment_session_id": data["payment_session_id"],
-        "cf_order_id": data["cf_order_id"]
-    }
+    except HTTPException as e:
+        raise e
 
-except HTTPException as e:
-    raise e
+    except Exception as e:
 
-except Exception as e:
+        logger.error(str(e))
 
-    logger.error(str(e))
-
-    raise HTTPException(
-        status_code=500,
-        detail=f"Cashfree Error: {str(e)}"
-    )
+        raise HTTPException(
+            status_code=500,
+            detail=f"Cashfree Error: {str(e)}"
+        )
   
 # =========================
 # NOWPAYMENTS CRYPTO PAYMENT
