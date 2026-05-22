@@ -264,7 +264,7 @@ async def send_welcome_email(user_email: str):
             "html": """
             <div style="font-family:Arial;padding:30px;background:#f8f9fb;">
                 <div style="max-width:650px;margin:auto;background:white;padding:40px;border-radius:14px;">
-                    <h1>Welcome to Thruster 🚀</h1>
+                    <h1>Welcome to Thruster </h1>
 
                     <p>Your account has been successfully created.</p>
 
@@ -818,10 +818,10 @@ async def create_inr_payment(
 
         logger.info(data)
 
-        if response.status_code != 200:
-            raise HTTPException(
-                status_code=400,
-                detail=data
+        if response.status_code not in [200, 201]:
+    raise HTTPException(
+        status_code=400,
+        detail=data
             )
 
         # SAVE PAYMENT
@@ -857,13 +857,16 @@ async def create_inr_payment(
             data["cf_order_id"]
         }
 
-    except Exception as e:
-        logger.error(str(e))
+    except HTTPException as e:
+    raise e
 
-        raise HTTPException(
-            status_code=500,
-            detail=str(e)
-        )
+except Exception as e:
+    logger.error(str(e))
+
+    raise HTTPException(
+        status_code=500,
+        detail=f"Cashfree Error: {str(e)}"
+    )
 
 # =========================
 # NOWPAYMENTS CRYPTO PAYMENT
