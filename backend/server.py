@@ -816,16 +816,16 @@ async def create_inr_payment(
 
         data = response.json()
 
-        logger.info(data)
+        logger.info(f"CASHFREE RESPONSE: {data}")
 
         if response.status_code not in [200, 201]:
 
-    logger.error("CASHFREE FAILED")
+            logger.error("CASHFREE FAILED")
 
-    raise HTTPException(
-        status_code=400,
-        detail=data
-    )
+            raise HTTPException(
+                status_code=400,
+                detail=data
+            )
 
         # SAVE PAYMENT
         payment = Payment(
@@ -861,15 +861,16 @@ async def create_inr_payment(
         }
 
     except HTTPException as e:
-    raise e
+        raise e
 
-except Exception as e:
-    logger.error(str(e))
+    except Exception as e:
 
-    raise HTTPException(
-        status_code=500,
-        detail=f"Cashfree Error: {str(e)}"
-    )
+        logger.error(str(e))
+
+        raise HTTPException(
+            status_code=500,
+            detail=f"Cashfree Error: {str(e)}"
+        )
 
 # =========================
 # NOWPAYMENTS CRYPTO PAYMENT
