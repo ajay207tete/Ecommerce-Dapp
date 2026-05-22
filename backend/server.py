@@ -667,6 +667,17 @@ async def create_order(
 
     return order
 
+@api_router.get("/orders")
+async def get_orders(
+    current_user: User = Depends(get_current_user)
+):
+
+    orders = await db.orders.find(
+        {"user_id": current_user.id},
+        {"_id": 0}
+    ).to_list(100)
+
+    return orders
 
 # =========================
 # HOTEL BOOKING
