@@ -815,6 +815,10 @@ async def create_inr_payment(
         )
 
         data = response.json()
+        logger.info(f"CASHFREE STATUS CODE: {response.status_code}")
+logger.info(f"CASHFREE RESPONSE: {data}")
+logger.info(f"CASHFREE HEADERS: {headers}")
+logger.info(f"CASHFREE PAYLOAD: {payload}")
 
         logger.info(f"CASHFREE RESPONSE: {data}")
 
