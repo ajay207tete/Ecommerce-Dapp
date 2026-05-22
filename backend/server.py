@@ -819,10 +819,13 @@ async def create_inr_payment(
         logger.info(data)
 
         if response.status_code not in [200, 201]:
+
+    logger.error("CASHFREE FAILED")
+
     raise HTTPException(
         status_code=400,
         detail=data
-            )
+    )
 
         # SAVE PAYMENT
         payment = Payment(
