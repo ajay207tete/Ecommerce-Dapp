@@ -80,6 +80,8 @@ function App() {
             </div>
            </div>
           </BrowserRouter>
+          <SpeedInsights />
+          <Analytics />
         </CartProvider>
       </AuthProvider>
     </TonConnectUIProvider>
