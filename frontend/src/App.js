@@ -1,11 +1,12 @@
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import { Analytics } from '@vercel/analytics/react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { TonConnectUIProvider } from '@tonconnect/ui-react';
+import { TonConnectUIProvider, THEME } from '@tonconnect/ui-react';
 import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
 import { Toaster } from './components/ui/sonner';
 import Navbar from './components/Navbar';
+import IntroAnimation from './components/IntroAnimation';
 import Home from './pages/Home';
 import Products from './pages/Products';
 import ProductDetail from './pages/ProductDetail';
@@ -29,6 +30,16 @@ function App() {
   return (
     <TonConnectUIProvider 
       manifestUrl={manifestUrl}
+      uiPreferences={{
+        theme: THEME.DARK,
+        borderRadius: 'none',
+        colorsSet: {
+          [THEME.DARK]: {
+            connectButton: { background: '#fcee0a', foreground: '#000000' },
+            accent: '#fcee0a'
+          }
+        }
+      }}
       walletsListConfiguration={{
         includeWallets: [
           {
@@ -57,28 +68,35 @@ function App() {
       <AuthProvider>
         <CartProvider>
           <BrowserRouter>
-            <div className="w-full overflow-x-hidden bg-background text-foreground">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <Navbar />
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/products" element={<Products />} />
-                <Route path="/products/:id" element={<ProductDetail />} />
-                <Route path="/services" element={<Services />} />
-                <Route path="/hotels/:id" element={<HotelDetail />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/checkout" element={<Checkout />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/rewards" element={<RewardCenter />} />
-                <Route path="/nfts" element={<NFTGallery />} />
-                <Route path="/admin" element={<AdminPanel />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/payment-success" element={<PaymentSuccess />} />
-              </Routes>
-              <Toaster position="top-right" />
+            {/* Intro animation: logo, atom, wormhole, blockchain tunnel */}
+            <IntroAnimation />
+
+            {/* Vercel analytics (visitor counts and page speed) */}
+            <Analytics />
+            <SpeedInsights />
+
+            <div className="w-full overflow-x-hidden text-foreground">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <Navbar />
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/products" element={<Products />} />
+                  <Route path="/products/:id" element={<ProductDetail />} />
+                  <Route path="/services" element={<Services />} />
+                  <Route path="/hotels/:id" element={<HotelDetail />} />
+                  <Route path="/cart" element={<Cart />} />
+                  <Route path="/checkout" element={<Checkout />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/rewards" element={<RewardCenter />} />
+                  <Route path="/nfts" element={<NFTGallery />} />
+                  <Route path="/admin" element={<AdminPanel />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route path="/payment-success" element={<PaymentSuccess />} />
+                </Routes>
+                <Toaster position="top-right" />
+              </div>
             </div>
-           </div>
           </BrowserRouter>
         </CartProvider>
       </AuthProvider>
