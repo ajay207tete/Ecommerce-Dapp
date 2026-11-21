@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-import { Button } from '../components/ui/button';
 import { Card } from '../components/ui/card';
 
 import {
@@ -16,6 +15,7 @@ import {
 import { toast } from 'sonner';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const accents = ['#fcee0a', '#00f0ff', '#ff003c'];
 
 const Services = () => {
   const [hotels, setHotels] = useState([]);
@@ -127,7 +127,7 @@ const Services = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-2xl font-orbitron text-primary animate-pulse">
+        <div className="text-2xl font-bold uppercase tracking-[0.3em] text-[#fcee0a] animate-pulse">
           Loading...
         </div>
       </div>
@@ -144,59 +144,41 @@ const Services = () => {
         {/* Header */}
         <div className="mb-12">
 
-          <h1 className="text-4xl md:text-6xl font-bold font-orbitron uppercase mb-4 text-white">
-            Book
+          <p className="font-mono text-sm text-[#00f0ff] mb-2">Hotels on THRUSTER</p>
+
+          <h1 className="text-5xl md:text-7xl font-bold uppercase mb-3 text-white">
+            Bo<span className="text-[#fcee0a]">ok</span>
           </h1>
 
-          <p className="text-lg text-white/60 font-rajdhani mb-6">
+          <p className="text-lg text-white/60 mb-6">
             Book your next stay with crypto. Earn NFTs.
           </p>
 
           {/* Search Bar */}
-<div className="flex gap-3 w-full">
+          <div className="flex gap-3 w-full">
 
-  <div className="relative flex-1">
+            <div className="relative flex-1">
 
-    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/40" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-white/40" />
 
-    <input
-      type="text"
-      placeholder="Search hotels by name or location..."
-      value={searchQuery}
-      onChange={(e) => setSearchQuery(e.target.value)}
-      className="
-        w-full
-        h-12
-        bg-[#0F0F1C]
-        border
-        border-white/10
-        rounded-xl
-        pl-12
-        pr-4
-        text-white
-        outline-none
-        focus:border-primary
-      "
-    />
-  </div>
+              <input
+                type="text"
+                placeholder="Search hotels by name or location..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full h-12 bg-black border-2 border-[#262626] rounded-none pl-12 pr-4 text-white outline-none focus:border-[#fcee0a]"
+              />
+            </div>
 
-  <Button
-    className="
-      h-12
-      min-w-[120px]
-      bg-primary
-      hover:bg-primary/90
-      rounded-xl
-    "
-  >
-    Search
-  </Button>
+            <button type="button" className="cp-btn min-w-[120px]">
+              Search
+            </button>
 
-</div>
+          </div>
 
           {/* Nearby Badge */}
           {userLocation && (
-            <div className="flex items-center gap-2 mt-4 text-primary text-sm font-rajdhani">
+            <div className="flex items-center gap-2 mt-4 text-[#00f0ff] text-sm font-mono">
               <Navigation className="h-4 w-4" />
               Showing nearby hotels based on your location
             </div>
@@ -206,17 +188,15 @@ const Services = () => {
 
         {/* Empty */}
         {filteredHotels.length === 0 ? (
-          <div className="text-center py-20">
+          <div className="text-center py-20 border-2 border-dashed border-[#262626]">
 
-            <div className="text-6xl mb-4">
-              🏨
-            </div>
+            <Bed className="h-16 w-16 mx-auto mb-4 text-white/30" />
 
-            <h3 className="text-2xl font-orbitron text-white/60 mb-2">
+            <h3 className="text-2xl text-white/60 mb-2">
               No hotels found
             </h3>
 
-            <p className="text-white/40 font-rajdhani">
+            <p className="text-white/40">
               Try another location or search term
             </p>
 
@@ -225,7 +205,7 @@ const Services = () => {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-            {filteredHotels?.map((hotel) => {
+            {filteredHotels?.map((hotel, i) => {
 
               const distance =
                 userLocation &&
@@ -242,23 +222,26 @@ const Services = () => {
               return (
                 <Card
                   key={hotel.id}
-                  className="group relative overflow-hidden bg-[#0F0F1C] border-white/5 hover:border-secondary/50 transition-all duration-300 cursor-pointer"
+                  tabIndex={0}
+                  onKeyDown={(e) => e.key === 'Enter' && navigate(`/hotels/${hotel.id}`)}
+                  className="cut group relative overflow-hidden rounded-none border-0 border-l-[3px] bg-[#0d0d0d] text-white transition-colors hover:bg-[#141414] cursor-pointer"
+                  style={{ borderLeftColor: accents[i % 3] }}
                   onClick={() => navigate(`/hotels/${hotel.id}`)}
                   data-testid={`hotel-card-${hotel.id}`}
                 >
 
                   {/* Image */}
-                  <div className="aspect-video overflow-hidden bg-muted">
+                  <div className="aspect-video overflow-hidden bg-[#050505]">
 
                     {hotel.images && hotel.images[0] ? (
                       <img
                         src={hotel.images[0]}
                         alt={hotel.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-secondary/20">
-                        <Bed className="h-20 w-20 text-white/20" />
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Bed className="h-16 w-16 text-white/20" />
                       </div>
                     )}
 
@@ -267,14 +250,14 @@ const Services = () => {
                   {/* Content */}
                   <div className="p-6">
 
-                    <div className="flex items-start justify-between mb-2">
+                    <div className="flex items-start justify-between mb-2 gap-3">
 
-                      <h3 className="text-xl font-orbitron font-bold text-white">
+                      <h3 className="text-xl font-bold text-white">
                         {hotel.name}
                       </h3>
 
                       {hotel.rating && (
-                        <div className="flex items-center gap-1 text-secondary">
+                        <div className="flex items-center gap-1 text-[#fcee0a] shrink-0">
 
                           <Star className="h-4 w-4 fill-current" />
 
@@ -293,7 +276,7 @@ const Services = () => {
 
                         <MapPin className="h-4 w-4" />
 
-                        <span className="font-rajdhani">
+                        <span>
                           {hotel.location}
                         </span>
 
@@ -302,19 +285,20 @@ const Services = () => {
 
                     {/* Distance */}
                     {distance && (
-                      <div className="text-primary text-sm font-mono mb-3">
-                        📍 {distance} km away
+                      <div className="flex items-center gap-1 text-[#00f0ff] text-sm font-mono mb-3">
+                        <Navigation className="h-4 w-4" />
+                        {distance} km away
                       </div>
                     )}
 
                     {/* Description */}
-                    <p className="text-white/60 font-rajdhani mb-3 line-clamp-2">
+                    <p className="text-white/60 mb-3 line-clamp-2">
                       {hotel.description}
                     </p>
 
                     {/* Room Type */}
                     {hotel.room_type && (
-                      <div className="text-sm text-secondary font-mono mb-3">
+                      <div className="text-sm text-[#00f0ff] font-mono mb-3">
                         {hotel.room_type}
                       </div>
                     )}
@@ -329,7 +313,7 @@ const Services = () => {
                             .map((amenity, idx) => (
                               <span
                                 key={idx}
-                                className="text-xs px-2 py-1 bg-white/5 border border-white/10 rounded text-white/70 font-rajdhani"
+                                className="text-xs px-2 py-1 bg-white/5 border-l-2 border-[#262626] text-white/70"
                               >
                                 {amenity}
                               </span>
@@ -339,12 +323,12 @@ const Services = () => {
                       )}
 
                     {/* Footer */}
-                    <div className="flex items-center justify-between pt-4 border-t border-white/10">
+                    <div className="flex items-center justify-between pt-4 border-t border-[#262626]">
 
                       <div>
 
-                        <div className="text-2xl font-bold text-primary font-mono">
-                          ₹{hotel.price_per_night.toFixed(2)}
+                        <div className="text-2xl font-bold text-[#fcee0a] font-mono">
+                          ₹{Number(hotel.price_per_night || 0).toFixed(2)}
                         </div>
 
                         <div className="text-xs text-white/40 font-mono">
@@ -352,24 +336,24 @@ const Services = () => {
                         </div>
 
                         {hotel.available_rooms && (
-                          <div className="text-xs text-secondary font-mono mt-1">
+                          <div className="text-xs text-[#00f0ff] font-mono mt-1">
                             {hotel.available_rooms} rooms available
                           </div>
                         )}
 
                       </div>
 
-                      <Button
+                      <button
+                        type="button"
                         onClick={(e) => {
                           e.stopPropagation();
                           navigate(`/hotels/${hotel.id}`);
                         }}
-                        className="bg-primary hover:bg-primary/90"
-                        size="sm"
+                        className="cp-btn !py-2 !px-4 text-sm"
                         data-testid={`view-hotel-${hotel.id}`}
                       >
                         View Details
-                      </Button>
+                      </button>
 
                     </div>
 
