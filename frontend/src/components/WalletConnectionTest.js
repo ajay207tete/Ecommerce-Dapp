@@ -1,8 +1,12 @@
 import { useTonConnectUI, useTonAddress } from '@tonconnect/ui-react';
-import { Card } from './ui/card';
-import { Button } from './ui/button';
-import { CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { CheckCircle, AlertCircle, Check } from 'lucide-react';
 import { toast } from 'sonner';
+
+const tips = [
+  "Make sure you're using the deployed URL (not localhost)",
+  'Use mobile wallet QR scan or browser extension',
+  'Check if you have Tonkeeper or MyTonWallet installed',
+];
 
 const WalletConnectionTest = () => {
   const [tonConnectUI] = useTonConnectUI();
@@ -27,55 +31,62 @@ const WalletConnectionTest = () => {
   };
 
   return (
-    <Card className="bg-[#0F0F1C]/80 backdrop-blur-md border-white/10 p-6">
-      <h3 className="text-xl font-orbitron text-white mb-4">Wallet Connection Status</h3>
-      
+    <div
+      className="cut bg-[#0d0d0d] border-l-[3px] p-6"
+      style={{ borderLeftColor: walletAddress ? '#00f0ff' : '#fcee0a' }}
+    >
+      <h3 className="text-xl text-white mb-4">Wallet Connection Status</h3>
+
       {walletAddress ? (
         <div className="space-y-4">
-          <div className="flex items-center gap-3 p-4 bg-green-500/10 border border-green-500/30 rounded">
-            <CheckCircle className="h-6 w-6 text-green-500" />
+          <div className="flex items-center gap-3 p-4 bg-[#00f0ff]/10 border-l-2 border-[#00f0ff]">
+            <CheckCircle className="h-6 w-6 text-[#00f0ff]" />
             <div>
-              <div className="text-green-500 font-mono text-sm">Connected</div>
+              <div className="text-[#00f0ff] font-mono text-sm">Connected</div>
               <div className="text-white/80 font-mono text-xs">
                 {walletAddress.slice(0, 8)}...{walletAddress.slice(-6)}
               </div>
             </div>
           </div>
-          <Button 
+          <button
+            type="button"
             onClick={handleDisconnect}
-            variant="outline"
-            className="w-full border-red-500/30 text-red-500 hover:bg-red-500/10"
+            className="w-full h-12 border-2 border-[#ff003c] text-[#ff003c] uppercase tracking-[0.14em] font-bold hover:bg-[#ff003c] hover:text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#00f0ff]"
           >
             Disconnect Wallet
-          </Button>
+          </button>
         </div>
       ) : (
         <div className="space-y-4">
-          <div className="flex items-center gap-3 p-4 bg-yellow-500/10 border border-yellow-500/30 rounded">
-            <AlertCircle className="h-6 w-6 text-yellow-500" />
+          <div className="flex items-center gap-3 p-4 bg-[#fcee0a]/10 border-l-2 border-[#fcee0a]">
+            <AlertCircle className="h-6 w-6 text-[#fcee0a]" />
             <div>
-              <div className="text-yellow-500 font-rajdhani">Not Connected</div>
-              <div className="text-white/60 text-xs font-rajdhani">
+              <div className="text-[#fcee0a]">Not Connected</div>
+              <div className="text-white/60 text-xs">
                 Connect your TON wallet to proceed
               </div>
             </div>
           </div>
-          
-          <Button 
+
+          <button
+            type="button"
             onClick={handleConnect}
-            className="w-full bg-primary hover:bg-primary/90"
+            className="cp-btn w-full text-center !py-4"
           >
             Connect Wallet
-          </Button>
+          </button>
 
-          <div className="text-xs text-white/40 font-rajdhani space-y-1">
-            <p>✓ Make sure you're using the deployed URL (not localhost)</p>
-            <p>✓ Use mobile wallet QR scan or browser extension</p>
-            <p>✓ Check if you have Tonkeeper or MyTonWallet installed</p>
-          </div>
+          <ul className="text-xs text-white/50 space-y-1">
+            {tips.map((t) => (
+              <li key={t} className="flex items-start gap-2">
+                <Check className="h-3.5 w-3.5 text-[#00f0ff] mt-0.5 flex-shrink-0" />
+                {t}
+              </li>
+            ))}
+          </ul>
         </div>
       )}
-    </Card>
+    </div>
   );
 };
 
