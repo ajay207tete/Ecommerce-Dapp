@@ -1,0 +1,13 @@
+# THRUSTER
+
+> THRUSTER is a Web3 marketplace on the TON blockchain. Customers buy clothing and book hotels and pay with TON, USDT, BNB, Bitcoin, Ethereum, Solana or INR. Purchases and hotel bookings earn NFT rewards.
+
+## Pages
+- [Shop clothing](https://www.thruster.in/products): browse and buy products
+- [Book hotels](https://www.thruster.in/services): search hotels and book with crypto or INR
+- [Home](https://www.thruster.in/): overview of payments and NFT rewards
+
+## Payments
+- Crypto: TON, USDT (TON, TRON, BNB Chain), BNB, Bitcoin, Ethereum, Solana
+- INR via Cashfree
+- Wallet connection through TonConnect (Tonkeeper, MyTonWallet)
