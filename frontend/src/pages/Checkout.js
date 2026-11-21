@@ -7,24 +7,41 @@ import { useAuth } from '../contexts/AuthContext';
 
 import { useTonConnectUI } from '@tonconnect/ui-react';
 
+import { ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
 
+import CoinIcon from '../components/CoinIcon';
 import WalletConnectionHelp from '../components/WalletConnectionHelp';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-// pay_currency codes sent to /payments/create-crypto (NOWPayments).
-// Make sure each one is enabled in your NOWPayments account.
+// Coins shown when the customer picks Crypto.
+// "code" is the pay_currency sent to /payments/create-crypto (NOWPayments).
+// Make sure each code is enabled in your NOWPayments account.
 const COINS = [
-  { code: 'ton', label: 'TON', network: 'TON' },
-  { code: 'usdtton', label: 'USDT', network: 'TON' },
-  { code: 'usdttrc20', label: 'USDT', network: 'TRON (TRC20)' },
-  { code: 'usdtbsc', label: 'USDT', network: 'BNB Chain (BEP20)' },
-  { code: 'bnbbsc', label: 'BNB', network: 'BNB Chain' },
-  { code: 'btc', label: 'Bitcoin', network: 'Bitcoin' },
-  { code: 'eth', label: 'Ethereum', network: 'Ethereum' },
-  { code: 'sol', label: 'Solana', network: 'Solana' },
+  { id: 'ton', label: 'TON', sub: 'Toncoin', code: 'ton', network: 'TON' },
+  { id: 'bnb', label: 'BNB', sub: 'BNB Chain', code: 'bnbbsc', network: 'BNB Chain' },
+  { id: 'usdt', label: 'USDT', sub: 'Tether', code: null, network: null },
+  { id: 'btc', label: 'Bitcoin', sub: 'BTC', code: 'btc', network: 'Bitcoin' },
+  { id: 'eth', label: 'Ethereum', sub: 'ETH', code: 'eth', network: 'Ethereum' },
+  { id: 'sol', label: 'Solana', sub: 'SOL', code: 'sol', network: 'Solana' },
 ];
+
+// USDT exists on several networks, so the customer picks one
+const USDT_NETS = [
+  { code: 'usdtton', label: 'TON', tag: 'Jetton', network: 'TON' },
+  { code: 'usdttrc20', label: 'TRON', tag: 'TRC20', network: 'TRON (TRC20)' },
+  { code: 'usdtbsc', label: 'BNB Chain', tag: 'BEP20', network: 'BNB Chain (BEP20)' },
+];
+
+// Label and network for a payment code (used on the payment details page)
+const coinInfo = (code) => {
+  const c = COINS.find((x) => x.code === code);
+  if (c) return { label: c.label, network: c.network };
+  const n = USDT_NETS.find((x) => x.code === code);
+  if (n) return { label: 'USDT', network: n.network };
+  return null;
+};
 
 const inputCls =
   'w-full h-12 bg-black border-2 border-[#262626] rounded-none px-3 text-white outline-none focus:border-[#fcee0a]';
@@ -65,8 +82,20 @@ const Checkout = () => {
     phone: ''
   });
 
-  // 'INR' or a crypto code from COINS
-  const [paymentMethod, setPaymentMethod] = useState('INR');
+  // PAYMENT CHOICE
+  // payType: 'inr' (Cashfree) or 'crypto'
+  const [payType, setPayType] = useState('inr');
+  const [coin, setCoin] = useState('ton');
+  const [usdtNet, setUsdtNet] = useState('usdtton');
+
+  // 'INR' or a crypto code; the rest of this file uses this value
+  const selectedCoin = COINS.find((c) => c.id === coin);
+  const paymentMethod =
+    payType === 'inr'
+      ? 'INR'
+      : coin === 'usdt'
+      ? usdtNet
+      : selectedCoin.code;
 
   const [loading, setLoading] = useState(false);
 
@@ -504,7 +533,7 @@ const Checkout = () => {
 
   if (paymentInfo) {
 
-    const coin = COINS.find((c) => c.code === paymentMethod);
+    const info = coinInfo(paymentMethod);
 
     return (
       <div className="min-h-screen pt-24 md:pt-32 pb-12 px-4">
@@ -524,12 +553,12 @@ const Checkout = () => {
                   <span className={labelCls}>Send exactly</span>
 
                   <p className="text-3xl font-bold text-[#fcee0a] font-mono">
-                    {paymentInfo.pay_amount} {coin?.label}
+                    {paymentInfo.pay_amount} {info?.label}
                   </p>
 
-                  {coin && (
+                  {info && (
                     <p className="text-sm text-white/60 font-mono">
-                      Network: {coin.network}
+                      Network: {info.network}
                     </p>
                   )}
                 </div>
@@ -571,9 +600,9 @@ const Checkout = () => {
                 </div>
               )}
 
-              {coin && (
+              {info && (
                 <p className="text-sm text-white/60">
-                  Only send {coin.label} on {coin.network}. Funds sent on another network can be lost.
+                  Only send {info.label} on {info.network}. Funds sent on another network can be lost.
                 </p>
               )}
 
@@ -796,38 +825,104 @@ const Checkout = () => {
                     Payment Method
                   </span>
 
+                  {/* Step 1: INR or Crypto */}
                   <div
                     className="grid grid-cols-2 gap-3"
                     role="radiogroup"
-                    aria-label="Payment method"
+                    aria-label="Payment type"
                   >
 
                     <button
                       type="button"
                       role="radio"
-                      aria-checked={paymentMethod === 'INR'}
-                      onClick={() => setPaymentMethod('INR')}
-                      className={`${tileCls(paymentMethod === 'INR')} col-span-2`}
+                      aria-checked={payType === 'inr'}
+                      onClick={() => setPayType('inr')}
+                      className={tileCls(payType === 'inr')}
                     >
-                      <div className="text-lg font-bold uppercase tracking-wide">Pay with INR</div>
+                      <div className="text-lg font-bold uppercase tracking-wide">INR</div>
                       <div className="font-mono text-xs text-white/60">Cards, UPI, netbanking</div>
                     </button>
 
-                    {COINS.map((c) => (
-                      <button
-                        key={c.code}
-                        type="button"
-                        role="radio"
-                        aria-checked={paymentMethod === c.code}
-                        onClick={() => setPaymentMethod(c.code)}
-                        className={tileCls(paymentMethod === c.code)}
-                      >
-                        <div className="text-lg font-bold uppercase tracking-wide">{c.label}</div>
-                        <div className="font-mono text-xs text-white/60">{c.network}</div>
-                      </button>
-                    ))}
+                    <button
+                      type="button"
+                      role="radio"
+                      aria-checked={payType === 'crypto'}
+                      aria-expanded={payType === 'crypto'}
+                      onClick={() => setPayType('crypto')}
+                      className={tileCls(payType === 'crypto')}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="text-lg font-bold uppercase tracking-wide">Crypto</div>
+                        <ChevronDown
+                          className={`h-5 w-5 transition-transform ${
+                            payType === 'crypto' ? 'rotate-180' : ''
+                          }`}
+                        />
+                      </div>
+                      <div className="font-mono text-xs text-white/60">TON, USDT, BNB, BTC, ETH, SOL</div>
+                    </button>
 
                   </div>
+
+                  {/* Step 2: coin list (opens when Crypto is chosen) */}
+                  {payType === 'crypto' && (
+                    <div className="mt-3">
+
+                      <div
+                        className="grid grid-cols-2 sm:grid-cols-3 gap-3"
+                        role="radiogroup"
+                        aria-label="Cryptocurrency"
+                      >
+                        {COINS.map((c) => (
+                          <button
+                            key={c.id}
+                            type="button"
+                            role="radio"
+                            aria-checked={coin === c.id}
+                            onClick={() => setCoin(c.id)}
+                            className={`${tileCls(coin === c.id)} flex items-center gap-3`}
+                          >
+                            <CoinIcon coin={c.id} size={32} />
+                            <div className="min-w-0">
+                              <div className="font-bold uppercase tracking-wide leading-tight">{c.label}</div>
+                              <div className="font-mono text-[11px] text-white/60">{c.sub}</div>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* USDT network */}
+                      {coin === 'usdt' && (
+                        <div className="mt-4">
+                          <span className={labelCls}>USDT network</span>
+                          <div
+                            className="grid grid-cols-3 gap-2"
+                            role="radiogroup"
+                            aria-label="USDT network"
+                          >
+                            {USDT_NETS.map((n) => (
+                              <button
+                                key={n.code}
+                                type="button"
+                                role="radio"
+                                aria-checked={usdtNet === n.code}
+                                onClick={() => setUsdtNet(n.code)}
+                                className={tileCls(usdtNet === n.code)}
+                              >
+                                <div className="text-sm font-bold uppercase leading-tight">{n.label}</div>
+                                <div className="font-mono text-[11px] text-white/60">{n.tag}</div>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <p className="mt-3 font-mono text-xs text-white/50">
+                        You will pay in {coinInfo(paymentMethod)?.label} on {coinInfo(paymentMethod)?.network}.
+                      </p>
+
+                    </div>
+                  )}
 
                 </div>
 
