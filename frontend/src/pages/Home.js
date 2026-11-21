@@ -1,8 +1,52 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from '../components/ui/button';
 import { ArrowRight, Zap, Shield, Trophy, Rocket } from 'lucide-react';
 import WalletConnectionTest from '../components/WalletConnectionTest';
+
+const mask = {
+  WebkitMaskImage: 'url(/logo.png)',
+  maskImage: 'url(/logo.png)',
+  WebkitMaskSize: 'contain',
+  maskSize: 'contain',
+  WebkitMaskRepeat: 'no-repeat',
+  maskRepeat: 'no-repeat',
+  WebkitMaskPosition: 'center',
+  maskPosition: 'center',
+};
+
+const css = `
+@keyframes th-gl{0%,100%{transform:translate(0)}20%{transform:translate(-14px,3px)}40%{transform:translate(10px,-4px)}60%{transform:translate(-6px,6px)}80%{transform:translate(4px,0)}}
+.th-glitch-a{animation:th-gl 1.1s steps(2) 1 both}
+.th-glitch-b{animation:th-gl 1.1s steps(2) 1 .08s both}
+@media (prefers-reduced-motion: reduce){.th-glitch-a,.th-glitch-b{animation:none}}
+`;
+
+const features = [
+  {
+    icon: Zap,
+    color: '#fcee0a',
+    title: 'Crypto Payments',
+    text: 'Pay with TON, USDT, BNB, Bitcoin, ETH or Solana. Fast, secure, decentralized.',
+  },
+  {
+    icon: Trophy,
+    color: '#00f0ff',
+    title: 'NFT Rewards',
+    text: 'Earn NFTs on every purchase. Trade or collect.',
+  },
+  {
+    icon: Rocket,
+    color: '#ff003c',
+    title: 'Token System',
+    text: 'Earn THRUSTER tokens for rewards & discounts.',
+  },
+  {
+    icon: Shield,
+    color: '#ffffff',
+    title: '100% Secure',
+    text: 'Blockchain verified. Full control of assets.',
+  },
+];
 
 const Home = () => {
   useEffect(() => {
@@ -13,144 +57,97 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#030014] text-white">
+    <div className="min-h-screen text-white">
+      <style>{css}</style>
 
-      {/* HERO SECTION */}
-      <section className="relative overflow-hidden py-28 px-4">
-        
-        {/* Background Blur Image */}
-        <div className="absolute inset-0 opacity-30">
-          <div
-            className="absolute inset-0 scale-110"
-            style={{
-              backgroundImage: `url('https://images.unsplash.com/photo-1688377051459-aebb99b42bff')`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              filter: 'blur(12px)'
-            }}
-          />
-        </div>
+      {/* HERO */}
+      <section className="relative py-24 sm:py-28 px-1">
+        <div className="grid gap-10 lg:grid-cols-[1.2fr_.8fr] items-center max-w-6xl mx-auto">
 
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#030014]/90 via-[#0a0a1f]/80 to-[#1A1A2E]/90" />
+          <div>
+            <span className="inline-block mb-5 text-[#00f0ff] border-l-2 border-[#00f0ff] pl-3 text-xs tracking-widest font-mono">
+              WEB3 E-COMMERCE ON TON
+            </span>
 
-        <div className="relative z-10 max-w-6xl mx-auto text-center">
+            <h1 className="text-6xl sm:text-7xl lg:text-8xl font-bold leading-[.92] mb-6">
+              <span className="block">Shop.</span>
+              <span className="block text-[#fcee0a]">Book.</span>
+              <span className="block">Earn.</span>
+            </h1>
 
-          <span className="inline-block mb-6 text-secondary border border-secondary/40 px-4 py-2 text-xs tracking-widest font-mono rounded glow-secondary">
-            WEB3 E-COMMERCE ON TON
-          </span>
+            <p className="text-lg md:text-xl text-white/60 max-w-xl mb-9">
+              The future of decentralized commerce. Buy products & services with crypto.
+              <br />
+              Earn rewards. Collect NFTs. Own your digital destiny.
+            </p>
 
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-orbitron font-black mb-6 tracking-tight text-white glow-text-primary">
-            THRUSTER
-          </h1>
-
-          <p className="text-lg md:text-xl text-white/70 max-w-2xl mx-auto mb-10">
-            The future of decentralized commerce. Buy products & services with TON.
-            <br />
-            Earn rewards. Collect NFTs. Own your digital destiny.
-          </p>
-
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-
-            <Link to="/products">
-              <Button className="bg-primary hover:bg-primary/80 px-8 py-5 text-lg uppercase font-orbitron tracking-wide shadow-lg shadow-primary/40">
-                Shop Now <ArrowRight className="ml-2" />
-              </Button>
-            </Link>
-
-            <Link to="/services">
-              <Button variant="outline" className="border-secondary text-secondary px-8 py-5 text-lg uppercase hover:bg-secondary/10">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link to="/products" className="cp-btn inline-flex items-center justify-center">
+                Shop Now <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+              <Link to="/services" className="cp-btn cp-btn-outline inline-flex items-center justify-center">
                 Book Now
-              </Button>
-            </Link>
+              </Link>
+            </div>
+          </div>
 
+          {/* LOGO with one-time glitch */}
+          <div
+            className="relative aspect-square w-full max-w-[360px] mx-auto lg:ml-auto"
+            role="img"
+            aria-label="THRUSTER ram logo"
+          >
+            <i className="absolute inset-0 th-glitch-b" style={{ ...mask, background: '#ff003c' }} />
+            <i className="absolute inset-0 th-glitch-a" style={{ ...mask, background: '#00f0ff' }} />
+            <i className="absolute inset-0" style={{ ...mask, background: '#ffffff' }} />
           </div>
         </div>
 
-        {/* Bottom glow line */}
-        <div className="absolute bottom-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary to-transparent" />
+        <div className="absolute bottom-0 left-0 w-full h-[2px] bg-[#fcee0a]" />
       </section>
 
       {/* WALLET SECTION */}
-      <section className="py-16 px-4">
+      <section className="py-14 px-1">
         <div className="max-w-4xl mx-auto">
           <WalletConnectionTest />
         </div>
       </section>
 
       {/* FEATURES */}
-      <section className="py-20 px-4">
+      <section className="py-16 px-1">
         <div className="max-w-7xl mx-auto">
 
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-6xl font-orbitron font-bold mb-4">
-              WHY THRUSTER?
-            </h2>
-            <p className="text-white/60">
-              The most advanced Web3 marketplace on TON
-            </p>
+          <div className="mb-12">
+            <h2 className="text-4xl md:text-6xl font-bold mb-3">Why <span className="text-[#fcee0a]">Thruster?</span></h2>
+            <p className="text-white/60">The most advanced Web3 marketplace on TON</p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-
-            {/* CARD */}
-            <div className="bg-[#0F0F1C]/80 border border-white/10 p-6 rounded-xl hover:border-primary/60 hover:shadow-lg hover:shadow-primary/20 transition duration-300 backdrop-blur-md">
-              <Zap className="text-primary mb-4 h-10 w-10" />
-              <h3 className="text-xl font-bold mb-2">Crypto Payments</h3>
-              <p className="text-white/60 text-sm">
-                Pay with TON or any crypto. Fast, secure, decentralized.
-              </p>
-            </div>
-
-            <div className="bg-[#0F0F1C]/80 border border-white/10 p-6 rounded-xl hover:border-secondary/60 hover:shadow-lg hover:shadow-secondary/20 transition duration-300 backdrop-blur-md">
-              <Trophy className="text-secondary mb-4 h-10 w-10" />
-              <h3 className="text-xl font-bold mb-2">NFT Rewards</h3>
-              <p className="text-white/60 text-sm">
-                Earn NFTs on every purchase. Trade or collect.
-              </p>
-            </div>
-
-            <div className="bg-[#0F0F1C]/80 border border-white/10 p-6 rounded-xl hover:border-primary/60 hover:shadow-lg hover:shadow-primary/20 transition duration-300 backdrop-blur-md">
-              <Rocket className="text-primary mb-4 h-10 w-10" />
-              <h3 className="text-xl font-bold mb-2">Token System</h3>
-              <p className="text-white/60 text-sm">
-                Earn THRUSTER tokens for rewards & discounts.
-              </p>
-            </div>
-
-            <div className="bg-[#0F0F1C]/80 border border-white/10 p-6 rounded-xl hover:border-secondary/60 hover:shadow-lg hover:shadow-secondary/20 transition duration-300 backdrop-blur-md">
-              <Shield className="text-secondary mb-4 h-10 w-10" />
-              <h3 className="text-xl font-bold mb-2">100% Secure</h3>
-              <p className="text-white/60 text-sm">
-                Blockchain verified. Full control of assets.
-              </p>
-            </div>
-
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {features.map(({ icon: Icon, color, title, text }) => (
+              <div
+                key={title}
+                className="cut bg-[#0d0d0d] border-l-[3px] p-6 transition-colors hover:bg-[#141414]"
+                style={{ borderLeftColor: color }}
+              >
+                <Icon className="mb-4 h-10 w-10" style={{ color }} />
+                <h3 className="text-xl mb-2">{title}</h3>
+                <p className="text-white/60 text-sm">{text}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-24 px-4 bg-gradient-to-b from-transparent to-[#1A1A2E]">
-        <div className="max-w-4xl mx-auto text-center">
-
-          <h2 className="text-4xl md:text-6xl font-orbitron font-bold mb-6">
-            READY TO LAUNCH?
-          </h2>
-
-          <p className="text-white/70 mb-8 text-lg">
-            Join thousands earning rewards on THRUSTER
-          </p>
-
-          <Link to="/register">
-            <Button className="bg-primary hover:bg-primary/80 px-10 py-5 text-lg uppercase font-orbitron shadow-lg shadow-primary/40">
-              Get Started <ArrowRight className="ml-2" />
-            </Button>
+      <section className="py-20 px-1">
+        <div className="max-w-4xl mx-auto cut border-2 border-[#fcee0a] p-8 sm:p-12 text-center">
+          <h2 className="text-4xl md:text-6xl font-bold mb-5">Ready to launch?</h2>
+          <p className="text-white/70 mb-8 text-lg">Join thousands earning rewards on THRUSTER</p>
+          <Link to="/register" className="cp-btn inline-flex items-center justify-center">
+            Get Started <ArrowRight className="ml-2 h-5 w-5" />
           </Link>
-
         </div>
       </section>
-
     </div>
   );
 };
