@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Zap, Shield, Trophy, Rocket } from 'lucide-react';
 import WalletConnectionTest from '../components/WalletConnectionTest';
+import HomeFaq from '../components/HomeFaq';
 
 const mask = {
   WebkitMaskImage: 'url(/logo.png)',
@@ -137,6 +138,9 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      {/* FAQ */}
+      <HomeFaq />
 
       {/* CTA */}
       <section className="py-20 px-1">
