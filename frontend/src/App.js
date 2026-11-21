@@ -7,6 +7,7 @@ import { CartProvider } from './contexts/CartContext';
 import { Toaster } from './components/ui/sonner';
 import Navbar from './components/Navbar';
 import IntroAnimation from './components/IntroAnimation';
+import Assistant from './components/Assistant';
 import Home from './pages/Home';
 import Products from './pages/Products';
 import ProductDetail from './pages/ProductDetail';
