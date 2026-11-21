@@ -1,19 +1,23 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Button } from '../components/ui/button';
-import { Card } from '../components/ui/card';
-import { ShoppingCart, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ShoppingCart, ChevronLeft, ChevronRight, Check } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { toast } from 'sonner';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
+const arrow =
+  'absolute top-1/2 -translate-y-1/2 bg-black/70 hover:bg-[#fcee0a] hover:text-black text-white p-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 focus:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#00f0ff] transition';
+
+const qtyBtn =
+  'h-10 w-10 grid place-items-center border-2 border-[#262626] text-xl text-white hover:border-[#fcee0a] disabled:opacity-40 disabled:hover:border-[#262626] disabled:cursor-not-allowed';
+
 const ProductDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  
+
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -61,7 +65,7 @@ const ProductDetail = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-2xl font-orbitron text-primary animate-pulse">Loading...</div>
+        <div className="text-2xl font-bold uppercase tracking-[0.3em] text-[#fcee0a] animate-pulse">Loading...</div>
       </div>
     );
   }
@@ -75,20 +79,20 @@ const ProductDetail = () => {
   }
 
   return (
-   <div className="min-h-screen pt-24 md:pt-32 pb-12 px-4" data-testid="product-detail-page">
+    <div className="min-h-screen pt-24 md:pt-32 pb-12 px-4" data-testid="product-detail-page">
       <div className="container mx-auto max-w-6xl">
-        <Button
-          variant="ghost"
-          className="mb-6 text-white/60 hover:text-white"
+        <button
+          type="button"
+          className="mb-6 text-white/60 hover:text-[#fcee0a] uppercase tracking-[0.14em] text-sm font-semibold"
           onClick={() => navigate('/products')}
         >
           ← Back to Products
-        </Button>
+        </button>
 
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Image Gallery */}
           <div>
-            <div className="relative aspect-square overflow-hidden rounded-lg bg-muted mb-4 group">
+            <div className="cut relative aspect-square overflow-hidden bg-[#050505] mb-4 group border-l-[3px] border-[#fcee0a]">
               {product.images && product.images.length > 0 ? (
                 <>
                   <img
@@ -98,24 +102,18 @@ const ProductDetail = () => {
                   />
                   {product.images.length > 1 && (
                     <>
-                      <button
-                        onClick={prevImage}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
+                      <button onClick={prevImage} aria-label="Previous image" className={`${arrow} left-3`}>
                         <ChevronLeft className="h-6 w-6" />
                       </button>
-                      <button
-                        onClick={nextImage}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
+                      <button onClick={nextImage} aria-label="Next image" className={`${arrow} right-3`}>
                         <ChevronRight className="h-6 w-6" />
                       </button>
                     </>
                   )}
                 </>
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-secondary/20">
-                  <ShoppingCart className="h-20 w-20 text-white/20" />
+                <div className="w-full h-full flex items-center justify-center">
+                  <img src="/logo.png" alt="" className="w-1/2 opacity-25" />
                 </div>
               )}
             </div>
@@ -127,8 +125,9 @@ const ProductDetail = () => {
                   <button
                     key={idx}
                     onClick={() => setCurrentImageIndex(idx)}
-                    className={`aspect-square rounded overflow-hidden border-2 transition-all ${
-                      idx === currentImageIndex ? 'border-primary' : 'border-white/10 hover:border-white/30'
+                    aria-label={`Show image ${idx + 1}`}
+                    className={`aspect-square overflow-hidden border-2 transition-all ${
+                      idx === currentImageIndex ? 'border-[#fcee0a]' : 'border-[#262626] hover:border-white/40'
                     }`}
                   >
                     <img src={img} alt={`View ${idx + 1}`} className="w-full h-full object-cover" />
@@ -140,84 +139,90 @@ const ProductDetail = () => {
 
           {/* Product Info */}
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold font-orbitron text-white mb-4">
+            <h1 className="text-3xl md:text-5xl font-bold text-white mb-4">
               {product.name}
             </h1>
 
             <div className="mb-6">
-              <div className="text-4xl font-bold text-primary font-mono mb-2">
+              <div className="text-4xl font-bold text-[#fcee0a] font-mono mb-2">
                 ₹{product.price.toFixed(2)}
               </div>
               {product.stock > 0 ? (
-                <div className="text-secondary font-mono">
+                <div className="text-[#00f0ff] font-mono">
                   {product.stock} in stock
                 </div>
               ) : (
-                <div className="text-red-400 font-mono">Out of stock</div>
+                <div className="text-[#ff003c] font-mono">Out of stock</div>
               )}
             </div>
 
-            <p className="text-white/80 font-rajdhani text-lg mb-8">
+            <p className="text-white/70 text-lg mb-8">
               {product.description}
             </p>
 
             {product.category && (
               <div className="mb-6">
-                <span className="px-3 py-1 bg-white/5 border border-white/10 rounded text-sm text-white/70 font-rajdhani">
+                <span className="px-3 py-1 bg-white/5 border-l-2 border-[#00f0ff] text-sm text-white/70 uppercase tracking-wider">
                   {product.category}
                 </span>
               </div>
             )}
 
-            <Card className="bg-[#0F0F1C]/80 backdrop-blur-md border-white/10 p-6 mb-6">
+            <div className="cut bg-[#0d0d0d] border-l-[3px] border-[#00f0ff] p-6 mb-6">
               <div className="mb-4">
-                <label className="text-white/80 font-rajdhani mb-2 block">Quantity</label>
+                <label className="text-white/70 mb-2 block uppercase tracking-wider text-sm">Quantity</label>
                 <div className="flex items-center gap-4">
-                  <Button
-                    variant="outline"
-                    size="icon"
+                  <button
+                    type="button"
+                    aria-label="Decrease quantity"
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="bg-input border-white/10"
+                    className={qtyBtn}
                   >
                     -
-                  </Button>
+                  </button>
                   <span className="text-2xl font-mono text-white w-12 text-center">{quantity}</span>
-                  <Button
-                    variant="outline"
-                    size="icon"
+                  <button
+                    type="button"
+                    aria-label="Increase quantity"
                     onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
                     disabled={quantity >= product.stock}
-                    className="bg-input border-white/10"
+                    className={qtyBtn}
                   >
                     +
-                  </Button>
+                  </button>
                 </div>
               </div>
 
-              <div className="flex justify-between items-center mb-4 pt-4 border-t border-white/10">
-                <span className="text-white/60 font-rajdhani">Subtotal:</span>
-                <span className="text-2xl font-bold text-primary font-mono">
+              <div className="flex justify-between items-center mb-4 pt-4 border-t border-[#262626]">
+                <span className="text-white/60 uppercase tracking-wider text-sm">Subtotal:</span>
+                <span className="text-2xl font-bold text-[#fcee0a] font-mono">
                   ₹{(product.price * quantity).toFixed(2)}
                 </span>
               </div>
 
-              <Button
+              <button
+                type="button"
                 onClick={handleAddToCart}
                 disabled={product.stock === 0}
-                className="w-full bg-primary hover:bg-primary/90 font-orbitron uppercase py-6 text-lg"
+                className="cp-btn w-full inline-flex items-center justify-center !py-4 text-lg disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#fcee0a]"
               >
                 <ShoppingCart className="mr-2 h-5 w-5" />
                 Add to Cart
-              </Button>
-            </Card>
-
-            <div className="bg-secondary/10 border border-secondary/20 rounded p-4">
-              <p className="text-sm text-white/70 font-rajdhani">
-                ✓ Secure checkout with crypto payments<br />
-                ✓ Earn NFT with your purchase<br />
-                ✓ Fast worldwide shipping
-              </p>
+              </button>
             </div>
+
+            <ul className="space-y-2 text-sm text-white/70">
+              {[
+                'Secure checkout with crypto payments',
+                'Earn NFT with your purchase',
+                'Fast worldwide shipping',
+              ].map((t) => (
+                <li key={t} className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-[#00f0ff]" />
+                  {t}
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>
