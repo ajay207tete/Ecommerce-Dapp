@@ -51,9 +51,9 @@ const Products = () => {
   }
 
   return (
-    <div className="min-h-screen pt-24 md:pt-32 pb-12 px-4" data-testid="products-page">
-      <div className="container mx-auto">
-        <div className="mb-12">
+    <div className="min-h-screen pt-24 md:pt-32 pb-12 px-3 sm:px-4" data-testid="products-page">
+      <div className="container mx-auto !px-0 sm:!px-4">
+        <div className="mb-8 sm:mb-12 px-1">
           <p className="font-mono text-sm text-[#00f0ff] mb-2">THRUSTER marketplace</p>
           <h1 className="text-5xl md:text-7xl font-bold uppercase mb-3 text-white">
             Prod<span className="text-[#fcee0a]">ucts</span>
@@ -68,13 +68,13 @@ const Products = () => {
             <p className="text-white/40">Check back soon for new items!</p>
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
             {products?.map((product, i) => (
               <Card
                 key={product.id}
                 tabIndex={0}
                 onKeyDown={(e) => e.key === 'Enter' && navigate(`/products/${product.id}`)}
-                className="cut group relative overflow-hidden rounded-none border-0 border-l-[3px] bg-[#0d0d0d] text-white transition-colors hover:bg-[#141414] cursor-pointer"
+                className="cut group relative overflow-hidden rounded-none border-0 border-l-[3px] bg-[#0d0d0d] text-white transition-colors hover:bg-[#141414] cursor-pointer flex flex-col"
                 style={{ borderLeftColor: accents[i % 3] }}
                 onClick={() => navigate(`/products/${product.id}`)}
                 data-testid={`product-card-${product.id}`}
@@ -93,27 +93,25 @@ const Products = () => {
                   )}
                 </div>
 
-                <div className="p-6">
-                  <h3 className="text-xl font-bold mb-2 text-white">
+                <div className="p-3 sm:p-5 flex flex-col flex-1">
+                  <h3 className="text-base sm:text-xl font-bold mb-1 text-white leading-tight line-clamp-2">
                     {product.name}
                   </h3>
-                  <p className="text-white/60 mb-4 line-clamp-2">
+                  <p className="text-white/60 text-xs sm:text-base mb-3 line-clamp-2">
                     {product.description}
                   </p>
 
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="text-2xl font-bold text-[#fcee0a] font-mono">
-                        ₹{product.price.toFixed(2)}
-                      </div>
-                      {product.stock > 0 ? (
-                        <div className="text-xs text-[#00f0ff] font-mono">
-                          {product.stock} in stock
-                        </div>
-                      ) : (
-                        <div className="text-xs text-[#ff003c] font-mono">Out of stock</div>
-                      )}
+                  <div className="mt-auto">
+                    <div className="text-lg sm:text-2xl font-bold text-[#fcee0a] font-mono leading-none">
+                      ₹{product.price.toFixed(2)}
                     </div>
+                    {product.stock > 0 ? (
+                      <div className="text-[11px] sm:text-xs text-[#00f0ff] font-mono mt-1">
+                        {product.stock} in stock
+                      </div>
+                    ) : (
+                      <div className="text-[11px] sm:text-xs text-[#ff003c] font-mono mt-1">Out of stock</div>
+                    )}
 
                     <button
                       type="button"
@@ -122,7 +120,7 @@ const Products = () => {
                         handleAddToCart(product);
                       }}
                       disabled={product.stock === 0}
-                      className="cp-btn !py-2 !px-4 text-sm inline-flex items-center disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#fcee0a]"
+                      className="cp-btn w-full mt-3 !py-2 !px-2 text-xs sm:text-sm inline-flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#fcee0a]"
                       data-testid={`add-to-cart-${product.id}`}
                     >
                       <Plus className="h-4 w-4 mr-1" />
