@@ -18,44 +18,44 @@ module.exports = {
     },
     extend: {
       colors: {
-        border: "#2E2E48",
-        input: "#16213E",
-        ring: "#FF2E63",
-        background: "#030014",
-        foreground: "#EAEAEA",
+        border: "#262626",
+        input: "#0d0d0d",
+        ring: "#fcee0a",
+        background: "#000000",
+        foreground: "#f2f2f2",
         primary: {
-          DEFAULT: "#FF2E63",
-          foreground: "#FFFFFF",
+          DEFAULT: "#fcee0a",
+          foreground: "#000000",
         },
         secondary: {
-          DEFAULT: "#08D9D6",
+          DEFAULT: "#00f0ff",
           foreground: "#000000",
         },
         destructive: {
-          DEFAULT: "hsl(0 84.2% 60.2%)",
-          foreground: "hsl(0 0% 98%)",
+          DEFAULT: "#ff003c",
+          foreground: "#ffffff",
         },
         muted: {
-          DEFAULT: "#1A1A2E",
-          foreground: "#8892B0",
+          DEFAULT: "#0d0d0d",
+          foreground: "#8a8a8a",
         },
         accent: {
-          DEFAULT: "#252A34",
-          foreground: "#FF2E63",
+          DEFAULT: "#141414",
+          foreground: "#fcee0a",
         },
         popover: {
-          DEFAULT: "#0F0F1C",
-          foreground: "#EAEAEA",
+          DEFAULT: "#0d0d0d",
+          foreground: "#f2f2f2",
         },
         card: {
-          DEFAULT: "#0F0F1C",
-          foreground: "#EAEAEA",
+          DEFAULT: "#0d0d0d",
+          foreground: "#f2f2f2",
         },
       },
       borderRadius: {
-        lg: "0.75rem",
-        md: "0.5rem",
-        sm: "0.125rem",
+        lg: "0",
+        md: "0",
+        sm: "0",
       },
       keyframes: {
         "accordion-down": {
@@ -83,7 +83,8 @@ module.exports = {
         "fade-in": "fade-in 0.7s ease-out",
       },
       fontFamily: {
-        orbitron: ["'Orbitron'", "sans-serif"],
+        // Orbitron is no longer loaded, so both names use Rajdhani
+        orbitron: ["'Rajdhani'", "sans-serif"],
         rajdhani: ["'Rajdhani'", "sans-serif"],
         mono: ["'JetBrains Mono'", "monospace"],
       },
