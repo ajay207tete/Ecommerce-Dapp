@@ -1,29 +1,106 @@
 <!doctype html>
-
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />  <title>THRUSTER - Web3 E-Commerce & TON Marketplace</title>  <!-- SEO -->  <meta name="description" content="THRUSTER is a Web3 e-commerce platform on TON blockchain. Shop products, book services, and earn crypto rewards." />
-  <meta name="keywords" content="TON marketplace, Web3 shopping, NFT rewards, crypto ecommerce, TON dApp" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>THRUSTER: Crypto Clothing & Hotel Marketplace with NFT Rewards</title>
+
+  <!-- SEO -->
+  <meta name="description" content="THRUSTER is a Web3 marketplace on TON where you can buy clothing and book hotels, pay with TON, USDT, BNB, Bitcoin, ETH, Solana or INR, and earn NFT rewards." />
+  <meta name="keywords" content="buy clothes with crypto, crypto clothing store, hotel booking with crypto, TON marketplace, NFT rewards, pay with USDT, pay with Bitcoin, Web3 marketplace, TON dApp" />
   <meta name="robots" content="index, follow" />
-  <meta name="author" content="THRUSTER" />  <!-- Canonical (REPLACE WITH YOUR DOMAIN) -->  <link rel="canonical" href="https://yourdomain.com/" />  <!-- Favicon -->  <link rel="icon" type="image/png" href="%PUBLIC_URL%/Fevicon.png" />
-  <link rel="apple-touch-icon" href="%PUBLIC_URL%/Fevicon.png" />  <!-- Open Graph -->  <meta property="og:type" content="website" />
-  <meta property="og:title" content="THRUSTER Web3 Marketplace" />
-  <meta property="og:description" content="Shop, book services, and earn rewards using TON blockchain." />
-  <meta property="og:image" content="%PUBLIC_URL%/Fevicon.png" />
-  <meta property="og:url" content="https://yourdomain.com/" />  <!-- Twitter -->  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="THRUSTER Web3 Marketplace" />
-  <meta name="twitter:description" content="Decentralized shopping powered by TON." />
-  <meta name="twitter:image" content="%PUBLIC_URL%/Fevicon.png" />  <!-- Theme -->  <meta name="theme-color" content="#000000" />  <!-- Performance -->  <link rel="preconnect" href="https://sdk.cashfree.com" />
-  <link rel="dns-prefetch" href="//sdk.cashfree.com" />  <!-- Structured Data -->  <script type="application/ld+json">
+  <meta name="author" content="THRUSTER" />
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://www.thruster.in/" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="%PUBLIC_URL%/Fevicon.png" />
+  <link rel="apple-touch-icon" href="%PUBLIC_URL%/Fevicon.png" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="THRUSTER" />
+  <meta property="og:title" content="THRUSTER: Shop, Book and Earn with Crypto" />
+  <meta property="og:description" content="Buy clothing and book hotels with TON, USDT, BNB, Bitcoin, ETH or Solana. Earn NFT rewards." />
+  <meta property="og:image" content="https://www.thruster.in/Fevicon.png" />
+  <meta property="og:url" content="https://www.thruster.in/" />
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="THRUSTER: Shop, Book and Earn with Crypto" />
+  <meta name="twitter:description" content="Clothing and hotel booking marketplace on TON. Pay with crypto, earn NFT rewards." />
+  <meta name="twitter:image" content="https://www.thruster.in/Fevicon.png" />
+
+  <!-- Theme -->
+  <meta name="theme-color" content="#000000" />
+
+  <!-- Performance -->
+  <link rel="preconnect" href="https://sdk.cashfree.com" />
+  <link rel="dns-prefetch" href="//sdk.cashfree.com" />
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "THRUSTER",
-    "url": "https://www.thruster.in/",
-    "description": "Web3 e-commerce platform on TON blockchain"
+    "@graph": [
+      {
+        "@type": "Organization",
+        "name": "THRUSTER",
+        "url": "https://www.thruster.in/",
+        "logo": "https://www.thruster.in/logo.png",
+        "sameAs": [
+          "https://t.me/thrustercommunity",
+          "https://www.instagram.com/thruster.co.in",
+          "https://youtube.com/@thruster-yt"
+        ]
+      },
+      {
+        "@type": "WebSite",
+        "name": "THRUSTER",
+        "url": "https://www.thruster.in/",
+        "description": "Web3 marketplace on TON for clothing and hotel booking with crypto payments and NFT rewards"
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is THRUSTER?",
+            "acceptedAnswer": { "@type": "Answer", "text": "THRUSTER is a Web3 marketplace on the TON blockchain where you can buy clothing and book hotels, and pay with crypto or INR." }
+          },
+          {
+            "@type": "Question",
+            "name": "Which cryptocurrencies can I pay with?",
+            "acceptedAnswer": { "@type": "Answer", "text": "You can pay with TON, USDT (on TON, TRON or BNB Chain), BNB, Bitcoin, Ethereum and Solana. INR payments are also accepted." }
+          },
+          {
+            "@type": "Question",
+            "name": "What are the NFT benefits?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Purchases and hotel bookings earn NFT rewards. They appear in your NFT gallery, and hotel booking NFTs include your booking details." }
+          },
+          {
+            "@type": "Question",
+            "name": "Do I need a crypto wallet?",
+            "acceptedAnswer": { "@type": "Answer", "text": "To pay in TON and to receive and view NFTs, connect a TON wallet such as Tonkeeper or MyTonWallet. INR payments do not need a wallet." }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I book hotels on THRUSTER?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Yes. Search hotels by name or location, choose your dates and guests, and pay with crypto or INR." }
+          }
+        ]
+      }
+    ]
   }
-  </script>  <!-- Cashfree -->  <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>  <!-- UX Loading Style -->  <style>
+  </script>
+
+  <!-- Cashfree -->
+  <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+
+  <!-- Loading style -->
+  <style>
     body {
       margin: 0;
       background: #000;
@@ -34,7 +111,10 @@
       text-align: center;
       padding: 40px;
     }
-  </style>  <!-- Visual edit scripts (unchanged) -->  <script>
+  </style>
+
+  <!-- Visual edit scripts (unchanged) -->
+  <script>
     if (window.self !== window.top) {
       var debugMonitorScript = document.createElement('script');
       debugMonitorScript.src = 'https://assets.emergent.sh/scripts/debug-monitor.js';
@@ -47,9 +127,30 @@
       tailwindScript.src = 'https://cdn.tailwindcss.com';
       document.head.appendChild(tailwindScript);
     }
-  </script></head><body>
-  <noscript>You need to enable JavaScript to run THRUSTER.</noscript>  <!-- SEO + UX fallback -->  
-  <div id="root"></div>  <!-- PostHog (unchanged) -->  <script>
+  </script>
+</head>
+
+<body>
+  <noscript>
+    <h1>THRUSTER: clothing and hotel booking marketplace with crypto payments and NFT rewards</h1>
+    <p>You need to enable JavaScript to run THRUSTER.</p>
+  </noscript>
+
+  <!-- React replaces everything inside #root when the app loads.
+       Crawlers that do not run JavaScript read this text instead. -->
+  <div id="root">
+    <div id="seo-content">
+      <h1>THRUSTER: Shop, Book and Earn with Crypto</h1>
+      <p>THRUSTER is a Web3 marketplace on the TON blockchain. Buy clothing, book hotels, and pay with TON, USDT, BNB, Bitcoin, Ethereum, Solana or INR. Earn NFT rewards on purchases and hotel bookings.</p>
+      <p>
+        <a href="/products" style="color:#fcee0a">Shop clothing</a> |
+        <a href="/services" style="color:#fcee0a">Book hotels</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- PostHog (unchanged) -->
+  <script>
     !(function (t, e) {
       var o, n, p, r;
       e.__SV ||
@@ -84,5 +185,6 @@
     posthog.init("phc_xAvL2Iq4tFmANRE7kzbKwaSqp1HJjN7x48s3vr0CMjs", {
       api_host: "https://us.i.posthog.com"
     });
-  </script></body>
+  </script>
+</body>
 </html>
