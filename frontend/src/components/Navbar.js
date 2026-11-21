@@ -1,28 +1,15 @@
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { TonConnectButton, useTonAddress, useTonConnectUI } from '@tonconnect/ui-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { Button } from './ui/button';
-import { ShoppingCart, User, LogOut, LayoutDashboard, Gift, Wallet, Trophy, Menu } from 'lucide-react';
+import { ShoppingCart, User, LogOut, LayoutDashboard, Gift, Wallet, Trophy, Package } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
-
-const links = [
-  { to: '/', label: 'Home', end: true },
-  { to: '/products', label: 'Shop' },
-  { to: '/services', label: 'Hotels' },
-  { to: '/rewards', label: 'Rewards' },
-  { to: '/dashboard', label: 'Orders' },
-];
-
-const linkClass = ({ isActive }) =>
-  `px-3 py-1.5 text-sm font-semibold uppercase tracking-[0.14em] transition-colors ${
-    isActive ? 'bg-[#fcee0a] text-black' : 'text-white/60 hover:bg-[#fcee0a] hover:text-black'
-  }`;
 
 const menuContent =
   'bg-[#0d0d0d] border border-[#262626] border-l-[3px] border-l-[#fcee0a] rounded-none';
@@ -48,17 +35,8 @@ const Navbar = () => {
             <img src="/logo.png" alt="THRUSTER" className="h-9 w-9" />
           </Link>
 
-          {/* PAGE LINKS (desktop) */}
-          <div className="hidden md:flex items-center gap-1 mr-auto ml-4">
-            {links.map((l) => (
-              <NavLink key={l.to} to={l.to} end={l.end} className={linkClass}>
-                {l.label}
-              </NavLink>
-            ))}
-          </div>
-
-          {/* RIGHT SIDE */}
-          <div className="flex items-center gap-1 sm:gap-3 ml-auto md:ml-0">
+          {/* RIGHT SIDE: wallet, cart, sign in / account */}
+          <div className="flex items-center gap-1 sm:gap-3 ml-auto">
 
             {/* TON CONNECT WALLET BUTTON */}
             <div className="scale-75 sm:scale-90 md:scale-100 origin-right">
@@ -84,25 +62,7 @@ const Navbar = () => {
               )}
             </Link>
 
-            {/* MOBILE PAGE MENU */}
-            <div className="md:hidden">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" aria-label="Menu">
-                    <Menu className="h-5 w-5" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className={menuContent}>
-                  {links.map((l) => (
-                    <DropdownMenuItem key={l.to} className={itemClass} onClick={() => navigate(l.to)}>
-                      {l.label}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-
-            {/* USER MENU */}
+            {/* SIGN IN, or ACCOUNT MENU when signed in */}
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -113,8 +73,8 @@ const Navbar = () => {
 
                 <DropdownMenuContent align="end" className={menuContent}>
                   <DropdownMenuItem className={itemClass} onClick={() => navigate('/dashboard')}>
-                    <LayoutDashboard className="mr-2 h-4 w-4" />
-                    Dashboard
+                    <Package className="mr-2 h-4 w-4" />
+                    My Orders
                   </DropdownMenuItem>
 
                   <DropdownMenuItem className={itemClass} onClick={() => navigate('/rewards')}>
