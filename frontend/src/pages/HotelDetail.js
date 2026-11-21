@@ -4,8 +4,6 @@ import axios from 'axios';
 
 import { useAuth } from '../contexts/AuthContext';
 
-import { Button } from '../components/ui/button';
-import { Card } from '../components/ui/card';
 import { Calendar } from '../components/ui/calendar';
 
 import {
@@ -17,7 +15,6 @@ import {
 import {
   MapPin,
   Star,
-  Wifi,
   CalendarIcon,
   Users,
   Loader2,
@@ -30,6 +27,15 @@ import { toast } from 'sonner';
 import { cn } from '../lib/utils';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
+const arrow =
+  'absolute top-1/2 -translate-y-1/2 bg-black/70 hover:bg-[#fcee0a] hover:text-black text-white p-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#00f0ff] transition';
+
+const dateBtn =
+  'w-full flex items-center h-12 px-3 bg-black border-2 border-[#262626] text-left hover:border-[#fcee0a] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#00f0ff]';
+
+const stepBtn =
+  'h-12 w-12 shrink-0 grid place-items-center border-2 border-[#262626] text-2xl text-white hover:border-[#fcee0a]';
 
 const HotelDetail = () => {
   const { id } = useParams();
@@ -177,7 +183,7 @@ const HotelDetail = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl md:text-2xl font-orbitron text-primary animate-pulse">
+        <div className="text-2xl font-bold uppercase tracking-[0.3em] text-[#fcee0a] animate-pulse">
           Loading...
         </div>
       </div>
@@ -195,18 +201,18 @@ const HotelDetail = () => {
   }
 
   return (
-    <div className="min-h-screen pt-24 md:pt-32 pb-12 px-3 sm:px-4 bg-black">
+    <div className="min-h-screen pt-24 md:pt-32 pb-12 px-3 sm:px-4">
 
       <div className="max-w-6xl mx-auto">
 
         {/* Back Button */}
-        <Button
-          variant="ghost"
-          className="mb-5 text-white/60 hover:text-white text-sm"
+        <button
+          type="button"
+          className="mb-5 text-white/60 hover:text-[#fcee0a] uppercase tracking-[0.14em] text-sm font-semibold"
           onClick={() => navigate('/services')}
         >
           ← Back to Hotels
-        </Button>
+        </button>
 
         <div className="grid lg:grid-cols-2 gap-6 lg:gap-10">
 
@@ -214,7 +220,7 @@ const HotelDetail = () => {
           <div>
 
             {/* Main Image */}
-            <div className="relative aspect-video overflow-hidden rounded-2xl bg-muted mb-3 group border border-white/10">
+            <div className="cut relative aspect-video overflow-hidden bg-[#050505] mb-3 group border-l-[3px] border-[#fcee0a]">
 
               {hotel.images && hotel.images.length > 0 ? (
                 <>
@@ -228,14 +234,16 @@ const HotelDetail = () => {
                     <>
                       <button
                         onClick={prevImage}
-                        className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-black/60 text-white p-2 rounded-full"
+                        aria-label="Previous image"
+                        className={`${arrow} left-2 md:left-4`}
                       >
                         <ChevronLeft className="h-5 w-5" />
                       </button>
 
                       <button
                         onClick={nextImage}
-                        className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-black/60 text-white p-2 rounded-full"
+                        aria-label="Next image"
+                        className={`${arrow} right-2 md:right-4`}
                       >
                         <ChevronRight className="h-5 w-5" />
                       </button>
@@ -243,8 +251,8 @@ const HotelDetail = () => {
                   )}
                 </>
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-secondary/20">
-                  <Wifi className="h-16 w-16 text-white/20" />
+                <div className="w-full h-full flex items-center justify-center">
+                  <img src="/logo.png" alt="" className="h-1/2 opacity-25" />
                 </div>
               )}
             </div>
@@ -257,10 +265,11 @@ const HotelDetail = () => {
                   <button
                     key={idx}
                     onClick={() => setCurrentImageIndex(idx)}
-                    className={`aspect-video overflow-hidden rounded-lg border ${
+                    aria-label={`Show image ${idx + 1}`}
+                    className={`aspect-video overflow-hidden border-2 ${
                       idx === currentImageIndex
-                        ? 'border-primary'
-                        : 'border-white/10'
+                        ? 'border-[#fcee0a]'
+                        : 'border-[#262626] hover:border-white/40'
                     }`}
                   >
                     <img
@@ -284,7 +293,7 @@ const HotelDetail = () => {
               <div className="flex-1 min-w-0">
 
                 {/* Hotel Name */}
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold font-orbitron text-white leading-tight break-words">
+                <h1 className="text-4xl sm:text-5xl font-bold text-white leading-tight break-words">
                   {hotel.name}
                 </h1>
 
@@ -294,7 +303,7 @@ const HotelDetail = () => {
 
                     <MapPin className="h-4 w-4 shrink-0" />
 
-                    <span className="font-rajdhani text-base sm:text-lg break-words">
+                    <span className="text-base sm:text-lg break-words">
                       {hotel.location}
                     </span>
 
@@ -303,7 +312,7 @@ const HotelDetail = () => {
 
                 {/* Nearby */}
                 {userLocation && (
-                  <div className="text-primary text-sm mt-2">
+                  <div className="text-[#00f0ff] text-sm font-mono mt-2">
                     Nearby hotel detected based on your location
                   </div>
                 )}
@@ -312,9 +321,9 @@ const HotelDetail = () => {
 
               {/* Rating */}
               {hotel.rating && (
-                <div className="flex items-center gap-2 bg-secondary/20 px-3 py-2 rounded-xl shrink-0">
+                <div className="flex items-center gap-2 bg-[#fcee0a]/10 border-l-2 border-[#fcee0a] px-3 py-2 shrink-0">
 
-                  <Star className="h-4 w-4 fill-secondary text-secondary" />
+                  <Star className="h-4 w-4 fill-[#fcee0a] text-[#fcee0a]" />
 
                   <span className="text-lg sm:text-xl font-bold text-white">
                     {hotel.rating}
@@ -325,7 +334,7 @@ const HotelDetail = () => {
             </div>
 
             {/* Description */}
-            <p className="text-white/80 text-base sm:text-lg leading-relaxed font-rajdhani mb-6">
+            <p className="text-white/70 text-base sm:text-lg leading-relaxed mb-6">
               {hotel.description}
             </p>
 
@@ -333,11 +342,11 @@ const HotelDetail = () => {
             {hotel.room_type && (
               <div className="mb-5">
 
-                <span className="text-white/40 text-sm">
+                <span className="text-white/40 text-sm font-mono">
                   Room Type
                 </span>
 
-                <div className="text-primary text-2xl sm:text-3xl font-mono mt-1 break-words">
+                <div className="text-[#00f0ff] text-2xl sm:text-3xl font-mono mt-1 break-words">
                   {hotel.room_type}
                 </div>
 
@@ -348,7 +357,7 @@ const HotelDetail = () => {
             {hotel.amenities && hotel.amenities.length > 0 && (
               <div className="mb-6">
 
-                <span className="text-white/40 text-sm block mb-3">
+                <span className="text-white/40 text-sm font-mono block mb-3">
                   Amenities
                 </span>
 
@@ -357,7 +366,7 @@ const HotelDetail = () => {
                   {hotel.amenities.map((amenity, idx) => (
                     <span
                       key={idx}
-                      className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white/70"
+                      className="px-3 py-2 bg-white/5 border-l-2 border-[#262626] text-sm text-white/70"
                     >
                       {amenity}
                     </span>
@@ -370,21 +379,21 @@ const HotelDetail = () => {
 
             {/* MAP BELOW AMENITIES */}
             {hotel.location && (
-              <div className="mb-6 rounded-2xl overflow-hidden border border-white/10">
+              <div className="mb-6 overflow-hidden border border-[#262626]">
 
                 <iframe
                   title="Hotel Location"
                   width="100%"
-                  height="100"
+                  height="140"
                   frameBorder="0"
                   style={{ border: 0 }}
                   src={
-  hotel.latitude && hotel.longitude
-    ? `https://www.google.com/maps?q=${hotel.latitude},${hotel.longitude}&z=17&output=embed`
-    : `https://www.google.com/maps?q=${encodeURIComponent(
-        hotel.location
-      )}&output=embed`
-}
+                    hotel.latitude && hotel.longitude
+                      ? `https://www.google.com/maps?q=${hotel.latitude},${hotel.longitude}&z=17&output=embed`
+                      : `https://www.google.com/maps?q=${encodeURIComponent(
+                          hotel.location
+                        )}&output=embed`
+                  }
                   allowFullScreen
                   loading="lazy"
                 />
@@ -393,16 +402,16 @@ const HotelDetail = () => {
             )}
 
             {/* Booking Card */}
-            <Card className="bg-[#0F0F1C]/90 border border-white/10 backdrop-blur-md p-4 sm:p-6 rounded-2xl">
+            <div className="cut bg-[#0d0d0d] border-l-[3px] border-[#fcee0a] p-4 sm:p-6">
 
               {/* Price */}
               <div className="mb-6">
 
-                <div className="text-4xl sm:text-5xl font-bold text-primary font-mono">
-                  ₹{hotel.price_per_night.toFixed(2)}
+                <div className="text-4xl sm:text-5xl font-bold text-[#fcee0a] font-mono">
+                  ₹{Number(hotel.price_per_night || 0).toFixed(2)}
                 </div>
 
-                <div className="text-white/40 mt-1">
+                <div className="text-white/40 mt-1 font-mono text-sm">
                   per night
                 </div>
 
@@ -413,7 +422,7 @@ const HotelDetail = () => {
                 {/* Checkin */}
                 <div>
 
-                  <label className="text-white/80 block mb-2">
+                  <label className="text-white/70 block mb-2 uppercase tracking-wider text-sm">
                     Check-in Date
                   </label>
 
@@ -421,23 +430,20 @@ const HotelDetail = () => {
 
                     <PopoverTrigger asChild>
 
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          'w-full justify-start bg-input border-white/10 text-left h-12',
-                          !checkIn && 'text-white/40'
-                        )}
+                      <button
+                        type="button"
+                        className={cn(dateBtn, !checkIn && 'text-white/40')}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
 
                         {checkIn
                           ? format(checkIn, 'PPP')
                           : 'Select date'}
-                      </Button>
+                      </button>
 
                     </PopoverTrigger>
 
-                    <PopoverContent className="w-auto p-0 bg-[#0F0F1C] border-white/10">
+                    <PopoverContent className="w-auto p-0 bg-[#0d0d0d] border-[#262626] rounded-none">
 
                       <Calendar
                         mode="single"
@@ -455,7 +461,7 @@ const HotelDetail = () => {
                 {/* Checkout */}
                 <div>
 
-                  <label className="text-white/80 block mb-2">
+                  <label className="text-white/70 block mb-2 uppercase tracking-wider text-sm">
                     Check-out Date
                   </label>
 
@@ -463,23 +469,20 @@ const HotelDetail = () => {
 
                     <PopoverTrigger asChild>
 
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          'w-full justify-start bg-input border-white/10 text-left h-12',
-                          !checkOut && 'text-white/40'
-                        )}
+                      <button
+                        type="button"
+                        className={cn(dateBtn, !checkOut && 'text-white/40')}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
 
                         {checkOut
                           ? format(checkOut, 'PPP')
                           : 'Select date'}
-                      </Button>
+                      </button>
 
                     </PopoverTrigger>
 
-                    <PopoverContent className="w-auto p-0 bg-[#0F0F1C] border-white/10">
+                    <PopoverContent className="w-auto p-0 bg-[#0d0d0d] border-[#262626] rounded-none">
 
                       <Calendar
                         mode="single"
@@ -499,22 +502,22 @@ const HotelDetail = () => {
                 {/* Guests */}
                 <div>
 
-                  <label className="text-white/80 block mb-3">
+                  <label className="text-white/70 block mb-3 uppercase tracking-wider text-sm">
                     Guests
                   </label>
 
                   <div className="flex items-center justify-between gap-4">
 
-                    <Button
-                      variant="outline"
-                      size="icon"
+                    <button
+                      type="button"
+                      aria-label="Fewer guests"
                       onClick={() =>
                         setGuests(Math.max(1, guests - 1))
                       }
-                      className="bg-input border-white/10 h-12 w-12 shrink-0"
+                      className={stepBtn}
                     >
                       -
-                    </Button>
+                    </button>
 
                     <div className="flex items-center gap-2">
 
@@ -526,16 +529,16 @@ const HotelDetail = () => {
 
                     </div>
 
-                    <Button
-                      variant="outline"
-                      size="icon"
+                    <button
+                      type="button"
+                      aria-label="More guests"
                       onClick={() =>
                         setGuests(Math.min(10, guests + 1))
                       }
-                      className="bg-input border-white/10 h-12 w-12 shrink-0"
+                      className={stepBtn}
                     >
                       +
-                    </Button>
+                    </button>
 
                   </div>
                 </div>
@@ -544,7 +547,7 @@ const HotelDetail = () => {
                 {checkIn &&
                   checkOut &&
                   calculateNights() > 0 && (
-                    <div className="bg-secondary/10 border border-secondary/30 rounded-xl p-4">
+                    <div className="bg-[#00f0ff]/10 border-l-[3px] border-[#00f0ff] p-4">
 
                       <div className="flex justify-between text-white/80 mb-2">
                         <span>Duration</span>
@@ -557,7 +560,7 @@ const HotelDetail = () => {
                         </span>
                       </div>
 
-                      <div className="flex justify-between text-2xl font-bold text-primary border-t border-white/10 pt-3">
+                      <div className="flex justify-between text-2xl font-bold text-[#fcee0a] border-t border-[#262626] pt-3">
 
                         <span>Total</span>
 
@@ -571,14 +574,15 @@ const HotelDetail = () => {
                   )}
 
                 {/* Book Button */}
-                <Button
+                <button
+                  type="button"
                   onClick={handleBookNow}
                   disabled={
                     bookingLoading ||
                     !checkIn ||
                     !checkOut
                   }
-                  className="w-full bg-primary hover:bg-primary/90 h-14 text-lg font-bold uppercase mt-2"
+                  className="cp-btn w-full inline-flex items-center justify-center !py-4 text-lg mt-2 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#fcee0a]"
                 >
                   {bookingLoading ? (
                     <>
@@ -588,10 +592,10 @@ const HotelDetail = () => {
                   ) : (
                     'Book Now'
                   )}
-                </Button>
+                </button>
 
               </div>
-            </Card>
+            </div>
 
           </div>
         </div>
