@@ -136,13 +136,13 @@ const Services = () => {
 
   return (
     <div
-      className="min-h-screen pt-24 md:pt-32 pb-12 px-4"
+      className="min-h-screen pt-24 md:pt-32 pb-12 px-3 sm:px-4"
       data-testid="services-page"
     >
-      <div className="container mx-auto">
+      <div className="container mx-auto !px-0 sm:!px-4">
 
         {/* Header */}
-        <div className="mb-12">
+        <div className="mb-8 sm:mb-12 px-1">
 
           <p className="font-mono text-sm text-[#00f0ff] mb-2">Hotels on THRUSTER</p>
 
@@ -170,7 +170,7 @@ const Services = () => {
               />
             </div>
 
-            <button type="button" className="cp-btn min-w-[120px]">
+            <button type="button" className="cp-btn min-w-[100px] sm:min-w-[120px]">
               Search
             </button>
 
@@ -203,7 +203,7 @@ const Services = () => {
           </div>
         ) : (
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
 
             {filteredHotels?.map((hotel, i) => {
 
@@ -224,14 +224,14 @@ const Services = () => {
                   key={hotel.id}
                   tabIndex={0}
                   onKeyDown={(e) => e.key === 'Enter' && navigate(`/hotels/${hotel.id}`)}
-                  className="cut group relative overflow-hidden rounded-none border-0 border-l-[3px] bg-[#0d0d0d] text-white transition-colors hover:bg-[#141414] cursor-pointer"
+                  className="cut group relative overflow-hidden rounded-none border-0 border-l-[3px] bg-[#0d0d0d] text-white transition-colors hover:bg-[#141414] cursor-pointer flex flex-col"
                   style={{ borderLeftColor: accents[i % 3] }}
                   onClick={() => navigate(`/hotels/${hotel.id}`)}
                   data-testid={`hotel-card-${hotel.id}`}
                 >
 
                   {/* Image */}
-                  <div className="aspect-video overflow-hidden bg-[#050505]">
+                  <div className="aspect-[4/3] sm:aspect-video overflow-hidden bg-[#050505]">
 
                     {hotel.images && hotel.images[0] ? (
                       <img
@@ -241,27 +241,27 @@ const Services = () => {
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <Bed className="h-16 w-16 text-white/20" />
+                        <Bed className="h-12 w-12 sm:h-16 sm:w-16 text-white/20" />
                       </div>
                     )}
 
                   </div>
 
                   {/* Content */}
-                  <div className="p-6">
+                  <div className="p-3 sm:p-6 flex flex-col flex-1">
 
-                    <div className="flex items-start justify-between mb-2 gap-3">
+                    <div className="flex items-start justify-between mb-1 sm:mb-2 gap-2">
 
-                      <h3 className="text-xl font-bold text-white">
+                      <h3 className="text-base sm:text-xl font-bold text-white leading-tight line-clamp-2">
                         {hotel.name}
                       </h3>
 
                       {hotel.rating && (
                         <div className="flex items-center gap-1 text-[#fcee0a] shrink-0">
 
-                          <Star className="h-4 w-4 fill-current" />
+                          <Star className="h-3.5 w-3.5 sm:h-4 sm:w-4 fill-current" />
 
-                          <span className="text-sm font-mono">
+                          <span className="text-xs sm:text-sm font-mono">
                             {hotel.rating}
                           </span>
 
@@ -272,11 +272,11 @@ const Services = () => {
 
                     {/* Location */}
                     {hotel.location && (
-                      <div className="flex items-center gap-2 text-white/60 text-sm mb-3">
+                      <div className="flex items-center gap-1.5 text-white/60 text-xs sm:text-sm mb-2 sm:mb-3">
 
-                        <MapPin className="h-4 w-4" />
+                        <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
 
-                        <span>
+                        <span className="line-clamp-1">
                           {hotel.location}
                         </span>
 
@@ -285,20 +285,20 @@ const Services = () => {
 
                     {/* Distance */}
                     {distance && (
-                      <div className="flex items-center gap-1 text-[#00f0ff] text-sm font-mono mb-3">
-                        <Navigation className="h-4 w-4" />
+                      <div className="flex items-center gap-1 text-[#00f0ff] text-xs sm:text-sm font-mono mb-2 sm:mb-3">
+                        <Navigation className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                         {distance} km away
                       </div>
                     )}
 
-                    {/* Description */}
-                    <p className="text-white/60 mb-3 line-clamp-2">
+                    {/* Description (hidden on phones to keep cards compact) */}
+                    <p className="hidden sm:block text-white/60 mb-3 line-clamp-2">
                       {hotel.description}
                     </p>
 
                     {/* Room Type */}
                     {hotel.room_type && (
-                      <div className="text-sm text-[#00f0ff] font-mono mb-3">
+                      <div className="hidden sm:block text-sm text-[#00f0ff] font-mono mb-3">
                         {hotel.room_type}
                       </div>
                     )}
@@ -306,7 +306,7 @@ const Services = () => {
                     {/* Amenities */}
                     {hotel.amenities &&
                       hotel.amenities.length > 0 && (
-                        <div className="flex flex-wrap gap-2 mb-4">
+                        <div className="hidden sm:flex flex-wrap gap-2 mb-4">
 
                           {hotel.amenities
                             .slice(0, 4)
@@ -323,25 +323,21 @@ const Services = () => {
                       )}
 
                     {/* Footer */}
-                    <div className="flex items-center justify-between pt-4 border-t border-[#262626]">
+                    <div className="mt-auto pt-3 sm:pt-4 border-t border-[#262626]">
 
-                      <div>
-
-                        <div className="text-2xl font-bold text-[#fcee0a] font-mono">
-                          ₹{Number(hotel.price_per_night || 0).toFixed(2)}
-                        </div>
-
-                        <div className="text-xs text-white/40 font-mono">
-                          per night
-                        </div>
-
-                        {hotel.available_rooms && (
-                          <div className="text-xs text-[#00f0ff] font-mono mt-1">
-                            {hotel.available_rooms} rooms available
-                          </div>
-                        )}
-
+                      <div className="text-lg sm:text-2xl font-bold text-[#fcee0a] font-mono leading-none">
+                        ₹{Number(hotel.price_per_night || 0).toFixed(2)}
                       </div>
+
+                      <div className="text-[11px] sm:text-xs text-white/40 font-mono mt-1">
+                        per night
+                      </div>
+
+                      {hotel.available_rooms && (
+                        <div className="text-[11px] sm:text-xs text-[#00f0ff] font-mono mt-1">
+                          {hotel.available_rooms} rooms available
+                        </div>
+                      )}
 
                       <button
                         type="button"
@@ -349,7 +345,7 @@ const Services = () => {
                           e.stopPropagation();
                           navigate(`/hotels/${hotel.id}`);
                         }}
-                        className="cp-btn !py-2 !px-4 text-sm"
+                        className="cp-btn w-full mt-3 !py-2 !px-2 text-xs sm:text-sm"
                         data-testid={`view-hotel-${hotel.id}`}
                       >
                         View Details
