@@ -7,24 +7,32 @@ import { useAuth } from '../contexts/AuthContext';
 
 import { useTonConnectUI } from '@tonconnect/ui-react';
 
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
-import { Card } from '../components/ui/card';
-
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '../components/ui/select';
-
 import { toast } from 'sonner';
 
 import WalletConnectionHelp from '../components/WalletConnectionHelp';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
+// pay_currency codes sent to /payments/create-crypto (NOWPayments).
+// Make sure each one is enabled in your NOWPayments account.
+const COINS = [
+  { code: 'ton', label: 'TON', network: 'TON' },
+  { code: 'usdtton', label: 'USDT', network: 'TON' },
+  { code: 'usdttrc20', label: 'USDT', network: 'TRON (TRC20)' },
+  { code: 'usdtbsc', label: 'USDT', network: 'BNB Chain (BEP20)' },
+  { code: 'bnbbsc', label: 'BNB', network: 'BNB Chain' },
+  { code: 'btc', label: 'Bitcoin', network: 'Bitcoin' },
+  { code: 'eth', label: 'Ethereum', network: 'Ethereum' },
+  { code: 'sol', label: 'Solana', network: 'Solana' },
+];
+
+const inputCls =
+  'w-full h-12 bg-black border-2 border-[#262626] rounded-none px-3 text-white outline-none focus:border-[#fcee0a]';
+const labelCls = 'block mb-2 text-sm uppercase tracking-wider text-white/70';
+const tileCls = (on) =>
+  `cut text-left p-3 border-l-4 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#00f0ff] ${
+    on ? 'border-[#fcee0a] bg-[#fcee0a]/10' : 'border-white/10 bg-[#0d0d0d] hover:border-[#00f0ff]'
+  }`;
 
 const Checkout = () => {
 
@@ -57,6 +65,7 @@ const Checkout = () => {
     phone: ''
   });
 
+  // 'INR' or a crypto code from COINS
   const [paymentMethod, setPaymentMethod] = useState('INR');
 
   const [loading, setLoading] = useState(false);
@@ -119,78 +128,116 @@ const Checkout = () => {
   // =========================
   // SUBMIT
   // =========================
-     const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
 
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!user || !token) {
+    if (!user || !token) {
 
-    toast.error('Please login first');
+      toast.error('Please login first');
 
-    navigate('/login');
+      navigate('/login');
 
-    return;
-  }
+      return;
+    }
 
-  setLoading(true);
+    setLoading(true);
 
-  try {
+    try {
 
-    // =========================
-    // HOTEL BOOKING
-    // =========================
+      // =========================
+      // HOTEL BOOKING
+      // =========================
 
-    if (orderType === 'hotel') {
+      if (orderType === 'hotel') {
 
-      const bookingPayload = {
+        const bookingPayload = {
 
-        hotel_id:
-          existingOrder?.items?.[0]?.item_id ||
-          orderId,
+          hotel_id:
+            existingOrder?.items?.[0]?.item_id ||
+            orderId,
 
-        hotel_name:
-          existingOrder?.booking_details?.hotel_name ||
-          existingOrder?.items?.[0]?.name ||
-          'Hotel Booking',
+          hotel_name:
+            existingOrder?.booking_details?.hotel_name ||
+            existingOrder?.items?.[0]?.name ||
+            'Hotel Booking',
 
-        check_in:
-          existingOrder?.booking_details?.check_in || '',
+          check_in:
+            existingOrder?.booking_details?.check_in || '',
 
-        check_out:
-          existingOrder?.booking_details?.check_out || '',
+          check_out:
+            existingOrder?.booking_details?.check_out || '',
 
-        guests:
-          existingOrder?.booking_details?.guests || 1,
+          guests:
+            existingOrder?.booking_details?.guests || 1,
 
-        nights:
-          existingOrder?.booking_details?.nights || 1,
+          nights:
+            existingOrder?.booking_details?.nights || 1,
 
-        room_type:
-          existingOrder?.booking_details?.room_type ||
-          'Standard',
+          room_type:
+            existingOrder?.booking_details?.room_type ||
+            'Standard',
 
-        total:
-          existingOrder?.total || orderTotal,
+          total:
+            existingOrder?.total || orderTotal,
 
-        full_name:
-          shippingInfo.full_name,
+          full_name:
+            shippingInfo.full_name,
 
-        phone:
-          shippingInfo.phone,
+          phone:
+            shippingInfo.phone,
 
-        location:
-          existingOrder?.booking_details?.location || '',
+          location:
+            existingOrder?.booking_details?.location || '',
 
-        hotel_image:
-          existingOrder?.booking_details?.hotel_image || ''
-      };
+          hotel_image:
+            existingOrder?.booking_details?.hotel_image || ''
+        };
 
-      // CREATE HOTEL BOOKING ORDER
-      const bookingResponse = await axios.post(
+        // CREATE HOTEL BOOKING ORDER
+        const bookingResponse = await axios.post(
 
-        `${API}/orders/hotel-booking`,
+          `${API}/orders/hotel-booking`,
 
-        bookingPayload,
+          bookingPayload,
+
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+
+        const bookingOrderId =
+          bookingResponse.data.id;
+
+        // PROCESS PAYMENT
+        await processPayment(
+          bookingOrderId
+        );
+
+        return;
+      }
+
+      // =========================
+      // NORMAL PRODUCT ORDER
+      // =========================
+
+      if (cartItems.length === 0) {
+
+        toast.error('Cart is empty');
+
+        setLoading(false);
+
+        return;
+      }
+
+      // CREATE NORMAL ORDER
+      const orderResponse = await axios.post(
+
+        `${API}/orders`,
+
+        shippingInfo,
 
         {
           headers: {
@@ -199,68 +246,30 @@ const Checkout = () => {
         }
       );
 
-      const bookingOrderId =
-        bookingResponse.data.id;
+      const newOrderId =
+        orderResponse.data.id;
 
-      // PROCESS PAYMENT
+      // PAYMENT
       await processPayment(
-        bookingOrderId
+        newOrderId
       );
 
-      return;
-    }
+    } catch (error) {
 
-    // =========================
-    // NORMAL PRODUCT ORDER
-    // =========================
+      console.error(error);
 
-    if (cartItems.length === 0) {
+      toast.error(
 
-      toast.error('Cart is empty');
+        error?.response?.data?.detail ||
+        'Checkout failed'
+      );
+
+    } finally {
 
       setLoading(false);
-
-      return;
     }
+  };
 
-    // CREATE NORMAL ORDER
-    const orderResponse = await axios.post(
-
-      `${API}/orders`,
-
-      shippingInfo,
-
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    );
-
-    const newOrderId =
-      orderResponse.data.id;
-
-    // PAYMENT
-    await processPayment(
-      newOrderId
-    );
-
-  } catch (error) {
-
-    console.error(error);
-
-    toast.error(
-
-      error?.response?.data?.detail ||
-      'Checkout failed'
-    );
-
-  } finally {
-
-    setLoading(false);
-  }
-};
-  
   // =========================
   // PAYMENT
   // =========================
@@ -303,14 +312,14 @@ const Checkout = () => {
 
         // CASHFREE SDK CHECK
         if (
-  typeof window.Cashfree !== "function"
-) {
-  toast.error(
-    "Cashfree SDK not loaded"
-  );
+          typeof window.Cashfree !== "function"
+        ) {
+          toast.error(
+            "Cashfree SDK not loaded"
+          );
 
-  return;
-}
+          return;
+        }
 
         // PRODUCTION MODE
         const cashfree = window.Cashfree({
@@ -318,24 +327,24 @@ const Checkout = () => {
         });
 
         const checkoutOptions = {
-  paymentSessionId:
-    response.data.payment_session_id,
+          paymentSessionId:
+            response.data.payment_session_id,
 
-  redirectTarget: "_self",
-};
+          redirectTarget: "_self",
+        };
 
-cashfree.checkout(checkoutOptions)
-.then((result) => {
+        cashfree.checkout(checkoutOptions)
+          .then((result) => {
 
-  console.log("Cashfree Result:", result);
+            console.log("Cashfree Result:", result);
 
-})
-.catch((err) => {
+          })
+          .catch((err) => {
 
-  console.error("Cashfree Error:", err);
+            console.error("Cashfree Error:", err);
 
-  toast.error("Cashfree checkout failed");
-});
+            toast.error("Cashfree checkout failed");
+          });
 
         return;
       }
@@ -452,6 +461,15 @@ cashfree.checkout(checkoutOptions)
     }
   };
 
+  const copyText = async (text, what) => {
+    try {
+      await navigator.clipboard.writeText(String(text));
+      toast.success(`${what} copied`);
+    } catch (e) {
+      toast.error('Could not copy');
+    }
+  };
+
   // =========================
   // LOGIN REQUIRED
   // =========================
@@ -461,19 +479,21 @@ cashfree.checkout(checkoutOptions)
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
 
-        <Card className="bg-[#0F0F1C]/80 border-white/10 p-8 text-center">
+        <div className="cut bg-[#0d0d0d] border-l-[3px] border-[#fcee0a] p-8 text-center">
 
-          <h2 className="text-2xl text-white mb-4">
+          <h2 className="text-2xl text-white mb-5">
             Login Required
           </h2>
 
-          <Button
+          <button
+            type="button"
+            className="cp-btn"
             onClick={() => navigate('/login')}
           >
             Login
-          </Button>
+          </button>
 
-        </Card>
+        </div>
       </div>
     );
   }
@@ -484,53 +504,93 @@ cashfree.checkout(checkoutOptions)
 
   if (paymentInfo) {
 
+    const coin = COINS.find((c) => c.code === paymentMethod);
+
     return (
-      <div className="min-h-screen py-12 px-4">
+      <div className="min-h-screen pt-24 md:pt-32 pb-12 px-4">
 
         <div className="container mx-auto max-w-2xl">
 
-          <Card className="bg-[#0F0F1C]/80 border-white/10 p-8">
+          <div className="cut bg-[#0d0d0d] border-l-[3px] border-[#fcee0a] p-6 sm:p-8">
 
-            <h2 className="text-3xl text-primary mb-6">
+            <h2 className="text-3xl text-[#fcee0a] mb-6">
               Payment Details
             </h2>
 
-            <div className="space-y-4">
+            <div className="space-y-5">
 
-              <div>
-                <Label>Amount</Label>
+              {paymentInfo.pay_amount && (
+                <div>
+                  <span className={labelCls}>Send exactly</span>
 
-                <p className="text-2xl text-primary">
-                  ₹{paymentInfo.amount}
-                </p>
-              </div>
+                  <p className="text-3xl font-bold text-[#fcee0a] font-mono">
+                    {paymentInfo.pay_amount} {coin?.label}
+                  </p>
+
+                  {coin && (
+                    <p className="text-sm text-white/60 font-mono">
+                      Network: {coin.network}
+                    </p>
+                  )}
+                </div>
+              )}
 
               {paymentInfo.pay_address && (
 
                 <div>
 
-                  <Label>
+                  <span className={labelCls}>
                     Send Payment To
-                  </Label>
+                  </span>
 
-                  <div className="bg-input p-4 rounded mt-2 break-all text-sm">
+                  <div className="bg-black border-l-2 border-[#00f0ff] p-4 mt-2 break-all text-sm font-mono text-[#00f0ff]">
 
                     {paymentInfo.pay_address}
 
                   </div>
 
+                  <div className="flex flex-wrap gap-3 mt-3">
+                    <button
+                      type="button"
+                      className="cp-btn cp-btn-outline !py-2 !px-4 text-sm"
+                      onClick={() => copyText(paymentInfo.pay_address, 'Address')}
+                    >
+                      Copy address
+                    </button>
+                    {paymentInfo.pay_amount && (
+                      <button
+                        type="button"
+                        className="cp-btn cp-btn-outline !py-2 !px-4 text-sm"
+                        onClick={() => copyText(paymentInfo.pay_amount, 'Amount')}
+                      >
+                        Copy amount
+                      </button>
+                    )}
+                  </div>
+
                 </div>
               )}
+
+              {coin && (
+                <p className="text-sm text-white/60">
+                  Only send {coin.label} on {coin.network}. Funds sent on another network can be lost.
+                </p>
+              )}
+
+              <p className="text-sm text-white/50 font-mono">
+                Order total: ₹{paymentInfo.amount}
+              </p>
             </div>
 
-            <Button
-              className="w-full mt-6"
+            <button
+              type="button"
+              className="cp-btn w-full text-center mt-8 !py-4"
               onClick={() => navigate('/dashboard')}
             >
               Go to Dashboard
-            </Button>
+            </button>
 
-          </Card>
+          </div>
         </div>
       </div>
     );
@@ -542,12 +602,13 @@ cashfree.checkout(checkoutOptions)
 
   return (
 
-    <div className="min-h-screen py-12 px-4">
+    <div className="min-h-screen pt-24 md:pt-32 pb-12 px-4">
 
       <div className="container mx-auto max-w-4xl">
 
-        <h1 className="text-5xl text-white mb-8">
-          Checkout
+        <p className="font-mono text-sm text-[#00f0ff] mb-2">Secure payment</p>
+        <h1 className="text-5xl md:text-6xl font-bold uppercase text-white mb-8">
+          Check<span className="text-[#fcee0a]">out</span>
         </h1>
 
         {!walletAddress && (
@@ -560,7 +621,7 @@ cashfree.checkout(checkoutOptions)
 
           <div>
 
-            <Card className="bg-[#0F0F1C]/80 border-white/10 p-6">
+            <div className="cut bg-[#0d0d0d] border-l-[3px] border-[#fcee0a] p-5 sm:p-6">
 
               <h2 className="text-2xl text-white mb-6">
 
@@ -583,11 +644,13 @@ cashfree.checkout(checkoutOptions)
 
                     <div>
 
-                      <Label className="text-white">
+                      <label className={labelCls} htmlFor="full_name">
                         Guest Name
-                      </Label>
+                      </label>
 
-                      <Input
+                      <input
+                        id="full_name"
+                        className={inputCls}
                         name="full_name"
                         value={shippingInfo.full_name}
                         onChange={handleInputChange}
@@ -598,11 +661,13 @@ cashfree.checkout(checkoutOptions)
 
                     <div>
 
-                      <Label className="text-white">
+                      <label className={labelCls} htmlFor="phone">
                         Phone
-                      </Label>
+                      </label>
 
-                      <Input
+                      <input
+                        id="phone"
+                        className={inputCls}
                         name="phone"
                         value={shippingInfo.phone}
                         onChange={handleInputChange}
@@ -618,11 +683,13 @@ cashfree.checkout(checkoutOptions)
                   <>
                     <div>
 
-                      <Label className="text-white">
+                      <label className={labelCls} htmlFor="full_name">
                         Full Name
-                      </Label>
+                      </label>
 
-                      <Input
+                      <input
+                        id="full_name"
+                        className={inputCls}
                         name="full_name"
                         value={shippingInfo.full_name}
                         onChange={handleInputChange}
@@ -633,11 +700,13 @@ cashfree.checkout(checkoutOptions)
 
                     <div>
 
-                      <Label className="text-white">
+                      <label className={labelCls} htmlFor="address">
                         Address
-                      </Label>
+                      </label>
 
-                      <Input
+                      <input
+                        id="address"
+                        className={inputCls}
                         name="address"
                         value={shippingInfo.address}
                         onChange={handleInputChange}
@@ -650,11 +719,13 @@ cashfree.checkout(checkoutOptions)
 
                       <div>
 
-                        <Label className="text-white">
+                        <label className={labelCls} htmlFor="city">
                           City
-                        </Label>
+                        </label>
 
-                        <Input
+                        <input
+                          id="city"
+                          className={inputCls}
                           name="city"
                           value={shippingInfo.city}
                           onChange={handleInputChange}
@@ -665,11 +736,13 @@ cashfree.checkout(checkoutOptions)
 
                       <div>
 
-                        <Label className="text-white">
+                        <label className={labelCls} htmlFor="postal_code">
                           Postal Code
-                        </Label>
+                        </label>
 
-                        <Input
+                        <input
+                          id="postal_code"
+                          className={inputCls}
                           name="postal_code"
                           value={shippingInfo.postal_code}
                           onChange={handleInputChange}
@@ -681,11 +754,13 @@ cashfree.checkout(checkoutOptions)
 
                     <div>
 
-                      <Label className="text-white">
+                      <label className={labelCls} htmlFor="country">
                         Country
-                      </Label>
+                      </label>
 
-                      <Input
+                      <input
+                        id="country"
+                        className={inputCls}
                         name="country"
                         value={shippingInfo.country}
                         onChange={handleInputChange}
@@ -696,11 +771,13 @@ cashfree.checkout(checkoutOptions)
 
                     <div>
 
-                      <Label className="text-white">
+                      <label className={labelCls} htmlFor="phone">
                         Phone
-                      </Label>
+                      </label>
 
-                      <Input
+                      <input
+                        id="phone"
+                        className={inputCls}
                         name="phone"
                         value={shippingInfo.phone}
                         onChange={handleInputChange}
@@ -715,40 +792,48 @@ cashfree.checkout(checkoutOptions)
 
                 <div className="pt-4">
 
-                  <Label className="text-white block mb-3">
+                  <span className={labelCls}>
                     Payment Method
-                  </Label>
+                  </span>
 
-                  <Select
-                    value={paymentMethod}
-                    onValueChange={setPaymentMethod}
+                  <div
+                    className="grid grid-cols-2 gap-3"
+                    role="radiogroup"
+                    aria-label="Payment method"
                   >
 
-                    <SelectTrigger>
+                    <button
+                      type="button"
+                      role="radio"
+                      aria-checked={paymentMethod === 'INR'}
+                      onClick={() => setPaymentMethod('INR')}
+                      className={`${tileCls(paymentMethod === 'INR')} col-span-2`}
+                    >
+                      <div className="text-lg font-bold uppercase tracking-wide">Pay with INR</div>
+                      <div className="font-mono text-xs text-white/60">Cards, UPI, netbanking</div>
+                    </button>
 
-                      <SelectValue />
+                    {COINS.map((c) => (
+                      <button
+                        key={c.code}
+                        type="button"
+                        role="radio"
+                        aria-checked={paymentMethod === c.code}
+                        onClick={() => setPaymentMethod(c.code)}
+                        className={tileCls(paymentMethod === c.code)}
+                      >
+                        <div className="text-lg font-bold uppercase tracking-wide">{c.label}</div>
+                        <div className="font-mono text-xs text-white/60">{c.network}</div>
+                      </button>
+                    ))}
 
-                    </SelectTrigger>
-
-                    <SelectContent>
-
-                      <SelectItem value="INR">
-                        Pay with INR
-                      </SelectItem>
-
-                      <SelectItem value="ton">
-                        TON
-                      </SelectItem>
-
-                    </SelectContent>
-
-                  </Select>
+                  </div>
 
                 </div>
 
-                <Button
+                <button
                   type="submit"
-                  className="w-full py-6 mt-6"
+                  className="cp-btn w-full text-center !py-4 text-lg mt-6 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#fcee0a]"
                   disabled={loading}
                 >
 
@@ -758,18 +843,18 @@ cashfree.checkout(checkoutOptions)
                     ? 'Confirm Booking'
                     : 'Place Order'}
 
-                </Button>
+                </button>
 
               </form>
 
-            </Card>
+            </div>
           </div>
 
           {/* RIGHT */}
 
           <div>
 
-            <Card className="bg-[#0F0F1C]/80 border-white/10 p-6 sticky top-24">
+            <div className="cut bg-[#0d0d0d] border-l-[3px] border-[#00f0ff] p-5 sm:p-6 md:sticky md:top-24">
 
               <h2 className="text-2xl text-white mb-6">
                 Order Summary
@@ -783,14 +868,14 @@ cashfree.checkout(checkoutOptions)
 
                     <div
                       key={item.item_id}
-                      className="flex justify-between text-white"
+                      className="flex justify-between gap-3 text-white"
                     >
 
                       <span>
                         {item.name}
                       </span>
 
-                      <span>
+                      <span className="font-mono">
                         ₹{(
                           item.price *
                           item.quantity
@@ -806,14 +891,14 @@ cashfree.checkout(checkoutOptions)
 
                     <div
                       key={item.item_id}
-                      className="flex justify-between text-white"
+                      className="flex justify-between gap-3 text-white"
                     >
 
                       <span>
                         {item.name} x {item.quantity}
                       </span>
 
-                      <span>
+                      <span className="font-mono">
                         ₹{(
                           item.price *
                           item.quantity
@@ -826,15 +911,15 @@ cashfree.checkout(checkoutOptions)
 
               </div>
 
-              <div className="border-t border-white/10 pt-4">
+              <div className="border-t border-[#262626] pt-4">
 
                 <div className="flex justify-between items-center">
 
-                  <span className="text-xl text-white">
+                  <span className="text-xl text-white uppercase tracking-wider">
                     Total
                   </span>
 
-                  <span className="text-3xl text-primary">
+                  <span className="text-3xl font-bold text-[#fcee0a] font-mono">
 
                     ₹{(
                       existingOrder
@@ -847,7 +932,7 @@ cashfree.checkout(checkoutOptions)
                 </div>
               </div>
 
-            </Card>
+            </div>
           </div>
         </div>
       </div>
