@@ -1,22 +1,20 @@
 import React from 'react';
-import { Card } from './ui/card';
-import { Button } from './ui/button';
-import { AlertCircle, Smartphone, Chrome } from 'lucide-react';
+import { AlertCircle, Smartphone, Chrome, Lightbulb } from 'lucide-react';
 
 const WalletConnectionHelp = () => {
   return (
-    <Card className="bg-[#0F0F1C]/80 backdrop-blur-md border-yellow-500/30 p-6 max-w-2xl mx-auto my-4">
+    <div className="cut bg-[#0d0d0d] border-l-[3px] border-[#fcee0a] p-6 max-w-2xl mx-auto my-4">
       <div className="flex items-start gap-4">
-        <AlertCircle className="h-6 w-6 text-yellow-500 flex-shrink-0 mt-1" />
+        <AlertCircle className="h-6 w-6 text-[#fcee0a] flex-shrink-0 mt-1" />
         <div>
-          <h3 className="text-lg font-orbitron text-white mb-3">
+          <h3 className="text-lg text-white mb-3">
             Having Trouble Connecting Your Wallet?
           </h3>
-          
-          <div className="space-y-4 text-white/80 font-rajdhani">
+
+          <div className="space-y-4 text-white/80">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <Smartphone className="h-5 w-5 text-secondary" />
+                <Smartphone className="h-5 w-5 text-[#00f0ff]" />
                 <strong className="text-white">Option 1: Use Mobile Wallet (Recommended)</strong>
               </div>
               <ol className="list-decimal list-inside space-y-1 text-sm ml-7">
@@ -29,7 +27,7 @@ const WalletConnectionHelp = () => {
 
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <Chrome className="h-5 w-5 text-secondary" />
+                <Chrome className="h-5 w-5 text-[#00f0ff]" />
                 <strong className="text-white">Option 2: Browser Extension</strong>
               </div>
               <ol className="list-decimal list-inside space-y-1 text-sm ml-7">
@@ -40,16 +38,17 @@ const WalletConnectionHelp = () => {
               </ol>
             </div>
 
-            <div className="bg-secondary/10 border border-secondary/30 rounded p-3 mt-4">
-              <p className="text-xs text-secondary">
-                💡 <strong>Note:</strong> If the connection modal shows "Failed to load", this is normal for 
+            <div className="bg-black border-l-2 border-[#00f0ff] p-3 mt-4 flex items-start gap-2">
+              <Lightbulb className="h-4 w-4 text-[#00f0ff] flex-shrink-0 mt-0.5" />
+              <p className="text-xs text-[#00f0ff] font-mono">
+                <strong>Note:</strong> If the connection modal shows "Failed to load", this is normal for
                 localhost development. Use one of the methods above - they work perfectly!
               </p>
             </div>
           </div>
         </div>
       </div>
-    </Card>
+    </div>
   );
 };
 
