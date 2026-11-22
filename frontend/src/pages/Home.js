@@ -85,7 +85,7 @@ const Home = () => {
             </h1>
 
             <p className="text-lg md:text-xl text-white/60 max-w-xl mb-9">
-              The future of decentralized commerce. Buy products & services with crypto.
+              THRUSTER-The future of decentralized commerce. Buy products & services with crypto.
               <br />
               Earn rewards. Collect NFTs. Own your digital destiny.
             </p>
