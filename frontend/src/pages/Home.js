@@ -1,19 +1,9 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Zap, Shield, Trophy, Rocket } from 'lucide-react';
 import WalletConnectionTest from '../components/WalletConnectionTest';
 import HomeFaq from '../components/HomeFaq';
-
-const mask = {
-  WebkitMaskImage: 'url(/logo.png)',
-  maskImage: 'url(/logo.png)',
-  WebkitMaskSize: 'contain',
-  maskSize: 'contain',
-  WebkitMaskRepeat: 'no-repeat',
-  maskRepeat: 'no-repeat',
-  WebkitMaskPosition: 'center',
-  maskPosition: 'center',
-};
+import { getLogoMask } from '../lib/logoMask';
 
 const css = `
 @keyframes th-gl{0%,100%{transform:translate(0)}20%{transform:translate(-14px,3px)}40%{transform:translate(10px,-4px)}60%{transform:translate(-6px,6px)}80%{transform:translate(4px,0)}}
@@ -50,12 +40,30 @@ const features = [
 ];
 
 const Home = () => {
+  const [logoUrl, setLogoUrl] = useState(null);
+
   useEffect(() => {
     if (window.Telegram?.WebApp) {
       window.Telegram.WebApp.ready();
       window.Telegram.WebApp.expand();
     }
   }, []);
+
+  // Build a clean logo shape, so the hero works with any logo.png
+  useEffect(() => {
+    getLogoMask().then((u) => setLogoUrl(u || '/logo.png'));
+  }, []);
+
+  const mask = logoUrl && {
+    WebkitMaskImage: `url(${logoUrl})`,
+    maskImage: `url(${logoUrl})`,
+    WebkitMaskSize: 'contain',
+    maskSize: 'contain',
+    WebkitMaskRepeat: 'no-repeat',
+    maskRepeat: 'no-repeat',
+    WebkitMaskPosition: 'center',
+    maskPosition: 'center',
+  };
 
   return (
     <div className="min-h-screen text-white">
@@ -98,9 +106,13 @@ const Home = () => {
             role="img"
             aria-label="THRUSTER ram logo"
           >
-            <i className="absolute inset-0 th-glitch-b" style={{ ...mask, background: '#ff003c' }} />
-            <i className="absolute inset-0 th-glitch-a" style={{ ...mask, background: '#00f0ff' }} />
-            <i className="absolute inset-0" style={{ ...mask, background: '#ffffff' }} />
+            {mask && (
+              <>
+                <i className="absolute inset-0 th-glitch-b" style={{ ...mask, background: '#ff003c' }} />
+                <i className="absolute inset-0 th-glitch-a" style={{ ...mask, background: '#00f0ff' }} />
+                <i className="absolute inset-0" style={{ ...mask, background: '#ffffff' }} />
+              </>
+            )}
           </div>
         </div>
 
