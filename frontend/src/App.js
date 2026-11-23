@@ -21,6 +21,7 @@ import NFTGallery from './pages/NFTGallery';
 import AdminPanel from './pages/AdminPanel';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import About from './pages/About';
 import PaymentSuccess from './pages/PaymentSuccess';
 import './App.css';
 
@@ -96,6 +97,7 @@ function App() {
                   <Route path="/admin" element={<AdminPanel />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
+                  <Route path="/about" element={<About />} />
                   <Route path="/payment-success" element={<PaymentSuccess />} />
                 </Routes>
                 <Toaster position="top-right" />
