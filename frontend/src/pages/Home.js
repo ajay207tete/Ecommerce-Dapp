@@ -162,6 +162,11 @@ const Home = () => {
           <Link to="/register" className="cp-btn inline-flex items-center justify-center">
             Get Started <ArrowRight className="ml-2 h-5 w-5" />
           </Link>
+          <p className="mt-6">
+            <Link to="/about" className="text-[#00f0ff] underline underline-offset-4 hover:text-[#fcee0a]">
+              Learn more about THRUSTER
+            </Link>
+          </p>
         </div>
       </section>
     </div>
