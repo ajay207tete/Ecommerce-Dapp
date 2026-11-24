@@ -1,147 +1,137 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import axios from "axios";
-import { Check, X, Loader2 } from "lucide-react";
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useTonAddress } from '@tonconnect/ui-react';
+import { useAuth } from '../contexts/AuthContext';
+import { toast } from 'sonner';
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+const inputCls =
+  'w-full h-12 bg-black border-2 border-[#262626] rounded-none px-3 text-white placeholder:text-white/30 outline-none focus:border-[#fcee0a]';
+const labelCls = 'block mb-2 text-sm uppercase tracking-wider text-white/70';
 
-const errText = (error, fallback) => {
-  const d = error?.response?.data?.detail;
-  if (typeof d === "string") return d;
-  if (d && typeof d.message === "string") return d.message;
-  return fallback;
-};
+const Register = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { register } = useAuth();
+  const navigate = useNavigate();
+  const walletAddress = useTonAddress();
 
-export default function PaymentSuccess() {
-  // state: "loading" | "success" | "error"
-  const [state, setState] = useState("loading");
-  const [message, setMessage] = useState("Verifying payment...");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  useEffect(() => {
+    if (password !== confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
 
-    const fail = (msg) => {
-      setState("error");
-      setMessage(msg);
-    };
+    if (password.length < 6) {
+      toast.error('Password must be at least 6 characters');
+      return;
+    }
 
-    const verifyPayment = async () => {
-      try {
+    setLoading(true);
+    const result = await register(email, password, walletAddress);
 
-        // GET ORDER ID FROM URL
-        const params = new URLSearchParams(window.location.search);
+    if (result.success) {
+      toast.success('Registration successful!');
+      navigate('/dashboard');
+    } else {
+      toast.error(result.error);
+    }
 
-        let orderId =
-          params.get("order_id") ||
-          params.get("orderId");
-
-        const paymentId = params.get("payment_id");
-
-        const token = localStorage.getItem("token");
-
-        if (!orderId && !paymentId) {
-          fail("Invalid payment link");
-          return;
-        }
-
-        if (!token) {
-          fail("Please login again");
-          return;
-        }
-
-        const headers = { Authorization: `Bearer ${token}` };
-
-        // TON PAYMENTS RETURN WITH A PAYMENT ID: LOOK UP THE ORDER
-        if (!orderId && paymentId) {
-          const payment = await axios.get(
-            `${API}/payments/${paymentId}/status`,
-            { headers }
-          );
-          orderId = payment.data?.order_id;
-
-          if (!orderId) {
-            fail("Invalid payment link");
-            return;
-          }
-        }
-
-        // VERIFY PAYMENT
-        const response = await axios.post(
-          `${API}/payments/verify?order_id=${orderId}`,
-          {},
-          { headers }
-        );
-
-        if (response.data.success) {
-
-          setState("success");
-          setMessage("Payment Successful!");
-
-          // OPTIONAL SMALL DELAY
-          setTimeout(() => {
-            window.location.href = "/dashboard";
-          }, 2500);
-
-        } else {
-
-          fail("Payment verification failed");
-
-        }
-
-      } catch (error) {
-
-        console.error(error);
-
-        fail(errText(error, "Payment verification failed"));
-      }
-    };
-
-    verifyPayment();
-
-  }, []);
-
-  const accent =
-    state === "success" ? "#fcee0a" : state === "error" ? "#ff003c" : "#00f0ff";
+    setLoading(false);
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center text-white px-4">
-      <div
-        className="cut bg-[#0d0d0d] border-l-[3px] p-8 sm:p-10 text-center max-w-md w-full"
-        style={{ borderLeftColor: accent }}
-        role="status"
-        aria-live="polite"
-      >
+    <div className="min-h-screen flex items-center justify-center px-4 pt-24 pb-12" data-testid="register-page">
+      <div className="cut w-full max-w-md bg-[#0d0d0d] border-l-[3px] border-[#fcee0a] p-6 sm:p-8">
 
-        <div
-          className="cut mx-auto mb-6 h-24 w-24 grid place-items-center border-4"
-          style={{ borderColor: accent, color: accent }}
-        >
-          {state === "loading" && <Loader2 className="h-12 w-12 animate-spin" />}
-          {state === "success" && <Check className="h-14 w-14" />}
-          {state === "error" && <X className="h-14 w-14" />}
+        <div className="mb-6">
+          <img src="/logo.png" alt="" className="h-12 w-12 mb-4" />
+          <p className="font-mono text-sm text-[#00f0ff] mb-1">Create your THRUSTER account</p>
+          <h1 className="text-4xl font-bold uppercase text-white">
+            Reg<span className="text-[#fcee0a]">ister</span>
+          </h1>
+
+          {walletAddress && (
+            <div className="mt-4 p-2 bg-[#00f0ff]/10 border-l-2 border-[#00f0ff] text-xs font-mono text-[#00f0ff]">
+              Wallet connected: {walletAddress.slice(0, 6)}...{walletAddress.slice(-4)}
+            </div>
+          )}
         </div>
 
-        <p className="font-mono text-sm text-white/50 mb-2">Payment status</p>
-
-        <h1 className="text-4xl font-bold mb-4" style={{ color: accent }}>
-          {state === "success" ? "Confirmed" : state === "error" ? "Problem" : "Checking"}
-        </h1>
-
-        <p className="text-xl text-white/80 mb-2">
-          {message}
-        </p>
-
-        {state === "success" && (
-          <p className="text-sm text-white/50 font-mono">Taking you to your dashboard...</p>
-        )}
-
-        {state !== "loading" && (
-          <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-            <Link to="/dashboard" className="cp-btn">View orders</Link>
-            <Link to="/products" className="cp-btn cp-btn-outline">Keep shopping</Link>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="email" className={labelCls}>Email</label>
+            <input
+              id="email"
+              type="email"
+              autoComplete="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className={inputCls}
+              data-testid="register-email-input"
+            />
           </div>
-        )}
 
+          <div>
+            <label htmlFor="password" className={labelCls}>Password</label>
+            <input
+              id="password"
+              type="password"
+              autoComplete="new-password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className={inputCls}
+              data-testid="register-password-input"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="confirmPassword" className={labelCls}>Confirm Password</label>
+            <input
+              id="confirmPassword"
+              type="password"
+              autoComplete="new-password"
+              placeholder="••••••••"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+              className={inputCls}
+              data-testid="register-confirm-password-input"
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="cp-btn w-full text-center !py-4 mt-2 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#fcee0a]"
+            disabled={loading}
+            data-testid="register-submit-btn"
+          >
+            {loading ? 'Creating account...' : 'Create Account'}
+          </button>
+        </form>
+
+        <div className="mt-6 text-center">
+          <p className="text-sm text-white/60">
+            Already have an account?{' '}
+            <Link
+              to="/login"
+              className="text-[#00f0ff] hover:text-[#fcee0a] underline underline-offset-4"
+              data-testid="register-login-link"
+            >
+              Sign in here
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
-}
+};
+
+export default Register;
